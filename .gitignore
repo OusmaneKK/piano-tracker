@@ -1,0 +1,30 @@
+# Xcode — état utilisateur (jamais versionné)
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+# Builds et produits dérivés
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.xcarchive
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Sécurité — ne jamais versionner de secrets ni de certificats
+*.p12
+*.mobileprovision
+*.cer
+*.certSigningRequest
+*.env
+.env*
+*.key
+*secrets*
+
+# macOS
+.DS_Store
