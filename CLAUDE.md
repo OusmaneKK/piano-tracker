@@ -14,7 +14,7 @@ Voir DESIGN.md pour la correspondance design → SwiftUI et les jetons de couleu
 
 ## Stack et contraintes
 
-- Swift 5.10+, SwiftUI, iOS 17 minimum. Xcode 16.
+- Swift 5.10+, SwiftUI, iOS 17 minimum. Xcode 16 ou plus récent (Xcode 26 sur la machine de dev).
 - Persistance : SwiftData. Pas de CoreData brut, pas de UserDefaults pour les données métier.
 - **Zéro dépendance externe** (pas de SPM tiers) tant que ce n'est pas indispensable. Les anneaux de progression et graphiques se dessinent en SwiftUI pur.
 - Architecture : MVVM léger. `@Observable` (Observation framework), pas de Combine.
@@ -90,7 +90,7 @@ PianoAppTests/
 - Une fonctionnalité = une branche = une PR, même en solo.
 - Ne jamais introduire d'abstraction pour un besoin futur listé « hors périmètre ».
 - Si une décision produit n'est pas tranchée ici, demander plutôt que supposer.
-- Après chaque modification du domaine : `xcodebuild test -scheme PianoApp -destination 'platform=iOS Simulator,name=iPhone 16'` doit passer.
+- Après chaque modification du domaine : `xcodebuild test -scheme PianoApp -destination 'platform=iOS Simulator,name=iPhone 17'` doit passer.
 - Le .gitignore respecte les règles de sécurité (jamais de secrets, certificats ni xcuserdata).
 - À la fin de chaque tâche, committer les fichiers.
 
