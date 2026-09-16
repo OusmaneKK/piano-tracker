@@ -39,6 +39,7 @@ enum Onglet: CaseIterable {
 struct RacineView: View {
     @Query private var profils: [Profil]
     @Environment(\.modelContext) private var contexte
+    @Environment(\.scenePhase) private var scenePhase
     @State private var onglet: Onglet = .aujourdhui
     @State private var sessionVM = SessionViewModel()
 
@@ -71,6 +72,14 @@ struct RacineView: View {
             }
         }
         .foregroundStyle(Nocturne.texte)
+        .task { sessionVM.configurer(contexte: contexte) }
+        .onChange(of: scenePhase) { _, phase in
+            switch phase {
+            case .active: sessionVM.rafraichir()
+            case .background: sessionVM.sauvegarder()
+            default: break
+            }
+        }
     }
 
     private var barreOnglets: some View {
