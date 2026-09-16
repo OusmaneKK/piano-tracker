@@ -1,0 +1,101 @@
+import SwiftUI
+import SwiftData
+
+/// Le timer de pratique : grand anneau, lecture/pause, remise à zéro, terminer.
+struct SessionView: View {
+    @Bindable var vm: SessionViewModel
+    /// Appelé quand la session est terminée (retour à l'accueil).
+    var terminer: () -> Void
+
+    @Environment(\.modelContext) private var contexte
+
+    var body: some View {
+        VStack(spacing: 20) {
+            VStack(spacing: 4) {
+                Kicker(texte: "Session de pratique")
+                Text("Clair de Lune — Section B")
+                    .font(.system(size: 16, weight: .medium))
+            }
+            .padding(.top, 16)
+
+            VStack(spacing: 10) {
+                ZStack {
+                    AnneauProgression(progression: vm.fractionAnneau,
+                                      diametre: 230, epaisseur: 8)
+                    VStack(spacing: 2) {
+                        Text(vm.affichage)
+                            .font(.system(size: 44, weight: .medium))
+                            .monospacedDigit()
+                        Text(vm.sousTexte)
+                            .font(.system(size: 12))
+                            .foregroundStyle(Nocturne.neutre400)
+                    }
+                }
+                Text("Chaque minute s'ajoute à ta route des 10 000 heures")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Nocturne.neutre400)
+            }
+            .padding(.top, 10)
+
+            HStack(spacing: 22) {
+                boutonSecondaire(icone: "arrow.counterclockwise") {
+                    vm.reinitialiser()
+                }
+                Button {
+                    vm.basculer()
+                } label: {
+                    ZStack {
+                        Circle().fill(Nocturne.accent900)
+                        Circle().strokeBorder(Nocturne.accent, lineWidth: 1.5)
+                        Image(systemName: vm.enCours ? "pause.fill" : "play.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(Nocturne.accent200)
+                    }
+                    .frame(width: 74, height: 74)
+                    .shadow(color: Nocturne.lueur.opacity(0.78), radius: 9)
+                    .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+                boutonSecondaire(icone: "checkmark") {
+                    if let duree = vm.terminer() {
+                        contexte.insert(SessionPratique(dureeSecondes: duree))
+                    }
+                    terminer()
+                }
+            }
+
+            HStack(spacing: 10) {
+                pastille(icone: "metronome", texte: "72 bpm")
+                pastille(icone: "pianokeys", texte: "MIDI à venir")
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private func boutonSecondaire(icone: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            ZStack {
+                Circle().strokeBorder(Nocturne.neutre600, lineWidth: 1)
+                Image(systemName: icone)
+                    .font(.system(size: 20))
+                    .foregroundStyle(Nocturne.neutre300)
+            }
+            .frame(width: 52, height: 52)
+            .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func pastille(icone: String, texte: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icone).font(.system(size: 12))
+            Text(texte).font(.system(size: 12))
+        }
+        .foregroundStyle(Nocturne.neutre300)
+        .padding(.horizontal, 13)
+        .padding(.vertical, 7)
+        .overlay(Capsule().strokeBorder(Nocturne.neutre700, lineWidth: 1))
+    }
+}

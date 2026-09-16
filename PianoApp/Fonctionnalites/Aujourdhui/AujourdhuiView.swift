@@ -1,0 +1,207 @@
+import SwiftUI
+import SwiftData
+
+/// L'écran d'accueil : objectif du jour, série, route des 10 000 heures, suggestions.
+struct AujourdhuiView: View {
+    let profil: Profil
+    var allerPratiquer: () -> Void
+
+    @Query(sort: \SessionPratique.date) private var sessions: [SessionPratique]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                entete
+                carteObjectifDuJour
+                carteRoute
+                suggestions
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 10)
+            .padding(.bottom, 24)
+        }
+    }
+
+    // MARK: Données dérivées
+
+    private var minutesAujourdhui: Int {
+        let calendrier = Calendar.current
+        return sessions
+            .filter { calendrier.isDateInToday($0.date) }
+            .reduce(0) { $0 + $1.dureeSecondes } / 60
+    }
+
+    private var heuresTotales: Double {
+        Double(sessions.reduce(0) { $0 + $1.dureeSecondes }) / 3600
+    }
+
+    private var serie: Int {
+        Progression.serie(joursDePratique: sessions.map(\.date))
+    }
+
+    private var salutation: String {
+        Calendar.current.component(.hour, from: .now) < 18 ? "Bonjour" : "Bonsoir"
+    }
+
+    private var dateDuJour: String {
+        Date.now.formatted(
+            Date.FormatStyle(locale: Locale(identifier: "fr_FR"))
+                .weekday(.wide).day().month(.wide)
+        )
+    }
+
+    // MARK: Sections
+
+    private var entete: some View {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 2) {
+                Kicker(texte: dateDuJour)
+                Text(salutation)
+                    .font(.system(size: 22, weight: .medium))
+            }
+            Spacer()
+            ZStack {
+                Circle().fill(Nocturne.accent800)
+                Image(systemName: "music.note")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(Nocturne.accent200)
+            }
+            .frame(width: 38, height: 38)
+        }
+    }
+
+    private var carteObjectifDuJour: some View {
+        let objectif = max(profil.objectifQuotidienMinutes, 1)
+        let restant = max(objectif - minutesAujourdhui, 0)
+        return HStack(spacing: 20) {
+            ZStack {
+                AnneauProgression(progression: Double(minutesAujourdhui) / Double(objectif),
+                                  diametre: 104, epaisseur: 7)
+                VStack(spacing: 0) {
+                    Text("\(minutesAujourdhui)")
+                        .font(.system(size: 22, weight: .medium))
+                        .monospacedDigit()
+                    Text("sur \(objectif) min")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Nocturne.neutre400)
+                }
+            }
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Pratique du jour")
+                    .font(.system(size: 15, weight: .medium))
+                Text(restant > 0
+                     ? "Encore \(restant) minutes pour atteindre l'objectif du jour. La régularité bat l'intensité."
+                     : "Objectif atteint — chaque minute de plus compte double.")
+                    .font(.system(size: 12.5))
+                    .foregroundStyle(Nocturne.neutre300)
+                    .lineSpacing(2)
+                    .padding(.top, 4)
+                if serie > 0 {
+                    HStack(spacing: 6) {
+                        Image(systemName: "flame.fill").font(.system(size: 14))
+                        Text("Série de \(serie) jour\(serie > 1 ? "s" : "")")
+                    }
+                    .font(.system(size: 12.5))
+                    .foregroundStyle(Nocturne.accent300)
+                    .padding(.top, 10)
+                }
+                HStack(spacing: 6) {
+                    Image(systemName: "timer").font(.system(size: 13))
+                    Text("Enregistré à la fin de chaque session")
+                }
+                .font(.system(size: 11.5))
+                .foregroundStyle(Nocturne.neutre400)
+                .padding(.top, 6)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(20)
+        .background(
+            LinearGradient(colors: [Nocturne.neutre800, Nocturne.surface],
+                           startPoint: .top, endPoint: .bottom)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(Nocturne.neutre700, lineWidth: 1)
+        )
+    }
+
+    private var carteRoute: some View {
+        let pct = Progression.pourcentage(heuresTotales: heuresTotales)
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .firstTextBaseline) {
+                Kicker(texte: "La route des 10 000 heures")
+                Spacer()
+                Text(pourcentageTexte(pct))
+                    .font(.system(size: 11))
+                    .monospacedDigit()
+                    .foregroundStyle(Nocturne.accent300)
+            }
+            BarreProgression(fraction: pct / 100)
+                .padding(.top, 10)
+            HStack {
+                Text("\(FormatTemps.heuresEntieres(heuresTotales)) heures au compteur")
+                Spacer()
+                Text("10 000")
+            }
+            .font(.system(size: 11.5))
+            .monospacedDigit()
+            .foregroundStyle(Nocturne.neutre400)
+            .padding(.top, 8)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .carteNocturne()
+    }
+
+    private var suggestions: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Continuer")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Nocturne.neutre300)
+            ligneSuggestion(icone: "music.note.list", fondIcone: Nocturne.accent900,
+                            teinteIcone: Nocturne.accent300,
+                            titre: "Clair de Lune — Section B",
+                            sousTitre: "Arpèges main gauche · 62 % appris")
+            ligneSuggestion(icone: "metronome", fondIcone: Nocturne.neutre800,
+                            teinteIcone: Nocturne.neutre300,
+                            titre: "Gammes — Ré majeur",
+                            sousTitre: "Échauffement · 10 min")
+        }
+    }
+
+    private func ligneSuggestion(icone: String, fondIcone: Color, teinteIcone: Color,
+                                 titre: String, sousTitre: String) -> some View {
+        Button(action: allerPratiquer) {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous).fill(fondIcone)
+                    Image(systemName: icone)
+                        .font(.system(size: 20))
+                        .foregroundStyle(teinteIcone)
+                }
+                .frame(width: 44, height: 44)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(titre).font(.system(size: 14, weight: .medium))
+                    Text(sousTitre)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Nocturne.neutre400)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Nocturne.neutre500)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .carteNocturne()
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func pourcentageTexte(_ pct: Double) -> String {
+        String(format: "%.1f", pct).replacingOccurrences(of: ".", with: ",") + " %"
+    }
+}
