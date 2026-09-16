@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXContainerItemProxy section */
@@ -16,23 +16,15 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		1A0000000000000000000020 /* PianoApp */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PianoApp;
-			sourceTree = "<group>";
-		};
-		1A0000000000000000000021 /* PianoAppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PianoAppTests;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFileReference section */
 		1A0000000000000000000012 /* PianoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PianoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A0000000000000000000013 /* PianoAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PianoAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		1A0000000000000000000020 /* PianoApp */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PianoApp; sourceTree = "<group>"; };
+		1A0000000000000000000021 /* PianoAppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PianoAppTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		1A0000000000000000000031 /* Frameworks */ = {
@@ -148,7 +140,6 @@
 			);
 			mainGroup = 1A0000000000000000000010;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 1A0000000000000000000011 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

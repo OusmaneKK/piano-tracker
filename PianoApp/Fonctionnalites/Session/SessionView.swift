@@ -8,6 +8,7 @@ struct SessionView: View {
     var terminer: () -> Void
 
     @Environment(\.modelContext) private var contexte
+    @State private var confirmerRemiseAZero = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -39,7 +40,9 @@ struct SessionView: View {
 
             HStack(spacing: 22) {
                 boutonSecondaire(icone: "arrow.counterclockwise") {
-                    vm.reinitialiser()
+                    if vm.secondesEcoulees > 0 {
+                        confirmerRemiseAZero = true
+                    }
                 }
                 Button {
                     vm.basculer()
@@ -72,6 +75,16 @@ struct SessionView: View {
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 20)
+        .confirmationDialog("Remettre le timer à zéro ?",
+                            isPresented: $confirmerRemiseAZero,
+                            titleVisibility: .visible) {
+            Button("Effacer \(vm.affichage) de pratique", role: .destructive) {
+                vm.reinitialiser()
+            }
+            Button("Continuer la session", role: .cancel) {}
+        } message: {
+            Text("Le temps écoulé ne sera pas enregistré.")
+        }
     }
 
     private func boutonSecondaire(icone: String, action: @escaping () -> Void) -> some View {
