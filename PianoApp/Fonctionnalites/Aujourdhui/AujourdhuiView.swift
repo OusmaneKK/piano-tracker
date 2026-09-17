@@ -7,6 +7,7 @@ struct AujourdhuiView: View {
     var allerPratiquer: () -> Void
 
     @Query(sort: \SessionPratique.date) private var sessions: [SessionPratique]
+    @State private var montrerAgenda = false
 
     var body: some View {
         ScrollView {
@@ -19,6 +20,14 @@ struct AujourdhuiView: View {
             .padding(.horizontal, 20)
             .padding(.top, 10)
             .padding(.bottom, 24)
+        }
+        .sheet(isPresented: $montrerAgenda) {
+            EditeurCreneauAgenda(heure: Calendar.current.date(bySettingHour: 19, minute: 0,
+                                                              second: 0, of: .now) ?? .now,
+                                 dureeMinutes: profil.objectifQuotidienMinutes) { _ in
+                montrerAgenda = false
+            }
+            .ignoresSafeArea()
         }
     }
 
@@ -168,12 +177,19 @@ struct AujourdhuiView: View {
                             teinteIcone: Nocturne.neutre300,
                             titre: "Gammes — Ré majeur",
                             sousTitre: "Échauffement · 10 min")
+            ligneSuggestion(icone: "calendar", fondIcone: Nocturne.neutre800,
+                            teinteIcone: Nocturne.neutre300,
+                            titre: "Réserver mon créneau",
+                            sousTitre: "Un rendez-vous quotidien dans ton agenda") {
+                montrerAgenda = true
+            }
         }
     }
 
     private func ligneSuggestion(icone: String, fondIcone: Color, teinteIcone: Color,
-                                 titre: String, sousTitre: String) -> some View {
-        Button(action: allerPratiquer) {
+                                 titre: String, sousTitre: String,
+                                 action: (() -> Void)? = nil) -> some View {
+        Button(action: action ?? allerPratiquer) {
             HStack(spacing: 14) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10, style: .continuous).fill(fondIcone)

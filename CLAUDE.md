@@ -34,7 +34,7 @@ PianoApp/
     FormatTemps.swift  mm:ss, heures localisées
   Fonctionnalites/
     RacineView.swift   barre d'onglets custom + aiguillage onboarding
-    Onboarding/        3 étapes : principe, objectif quotidien, clavier
+    Onboarding/        4 étapes : principe, objectif quotidien, créneau agenda, clavier
     Aujourdhui/        anneau d'objectif, route des 10 000 h, suggestions
     Session/           SessionView + SessionViewModel (timer)
     Parcours/          heures investies + frise des jalons
@@ -48,10 +48,13 @@ PianoAppTests/
 
 ## Fonctionnalités du MVP (dans l'ordre)
 
-### 1. Onboarding (3 étapes, à la première ouverture)
+### 1. Onboarding (4 étapes, à la première ouverture)
 1. Le principe : 10 000 heures vers la maîtrise, pas de raccourci.
 2. Choix de l'objectif quotidien : 30 / 45 / 60 / 90 min, avec prévision (« à ce rythme… »).
-3. Écran clavier (le vrai MIDI est hors périmètre : texte d'attente, un bouton pour commencer).
+3. Réservation du créneau quotidien : choix de l'heure, fiche système EventKitUI
+   pré-remplie (événement récurrent quotidien). Étape passable (« Plus tard »),
+   aussi accessible depuis Aujourd'hui.
+4. Écran clavier (le vrai MIDI est hors périmètre : texte d'attente, un bouton pour commencer).
 
 ### 2. Aujourd'hui
 - Salutation selon l'heure, date du jour.
@@ -81,7 +84,10 @@ PianoAppTests/
 ## Hors périmètre du MVP (ne pas implémenter, ne pas préparer « au cas où »)
 - MIDI / Bluetooth réels, détection audio, métronome fonctionnel (les mentions à l'écran restent du texte)
 - Lecture de partition, quiz de notes (prochaine grande fonctionnalité, après le MVP)
-- Routines hebdomadaires, planning, notifications
+- Routines hebdomadaires, planning, notifications.
+  **Exception actée (2026-09-18)** : l'écriture d'un événement récurrent « créneau
+  quotidien » via la fiche système EventKitUI (aucune permission requise sur iOS 17+).
+  La frontière tient : pas de lecture d'agenda, pas de replanification, pas de rappels.
 - Abonnement, StoreKit, compte utilisateur, sync iCloud
 - macOS / iPad (iOS seul ; SwiftUI rend le portage facile plus tard)
 

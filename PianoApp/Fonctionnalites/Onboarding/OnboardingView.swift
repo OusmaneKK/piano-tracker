@@ -1,12 +1,15 @@
 import SwiftUI
 
-/// Onboarding en trois étapes : le principe, l'objectif quotidien, le clavier.
+/// Onboarding en quatre étapes : le principe, l'objectif quotidien, le créneau, le clavier.
 struct OnboardingView: View {
     /// Appelé à la fin avec l'objectif quotidien choisi (en minutes).
     var terminer: (Int) -> Void
 
     @State private var etape = 1
     @State private var objectifMinutes = 60
+    @State private var heureCreneau = Calendar.current.date(bySettingHour: 19, minute: 0,
+                                                            second: 0, of: .now) ?? .now
+    @State private var montrerAgenda = false
 
     private static let options: [(minutes: Int, sousTitre: String)] = [
         (30, "Une habitude régulière"),
@@ -20,6 +23,7 @@ struct OnboardingView: View {
             switch etape {
             case 1: principe
             case 2: objectif
+            case 3: creneau
             default: clavier
             }
         }
@@ -139,7 +143,53 @@ struct OnboardingView: View {
         return "\(objectifMinutes) minutes par jour atteignent Novice (100 h) en environ \(mois) mois et Intermédiaire (1 000 h) en \(anneesTexte) ans. La route est longue — c'est le principe."
     }
 
-    // MARK: Étape 3 — le clavier
+    // MARK: Étape 3 — le créneau quotidien
+
+    private var creneau: some View {
+        VStack(spacing: 0) {
+            Spacer().frame(height: 60)
+            Text("Réserve ton créneau")
+                .font(.system(size: 22, weight: .medium))
+            Text("Même heure, même geste, chaque jour. Un créneau réservé dans ton agenda est plus difficile à ignorer qu'une bonne intention.")
+                .font(.system(size: 13.5))
+                .foregroundStyle(Nocturne.neutre300)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .frame(maxWidth: 290)
+                .padding(.top, 8)
+
+            DatePicker("Heure du créneau", selection: $heureCreneau,
+                       displayedComponents: .hourAndMinute)
+                .datePickerStyle(.wheel)
+                .labelsHidden()
+                .frame(maxHeight: 170)
+                .padding(.top, 18)
+
+            Text("\(objectifMinutes) minutes · tous les jours")
+                .font(.system(size: 12.5))
+                .monospacedDigit()
+                .foregroundStyle(Nocturne.accent300)
+                .padding(.top, 6)
+
+            Spacer()
+            pointsDePage(actif: 3)
+                .padding(.bottom, 22)
+            BoutonPilule(titre: "Réserver dans mon agenda") { montrerAgenda = true }
+            Button("Plus tard") { etape = 4 }
+                .font(.system(size: 13))
+                .foregroundStyle(Nocturne.neutre400)
+                .padding(.top, 14)
+        }
+        .sheet(isPresented: $montrerAgenda) {
+            EditeurCreneauAgenda(heure: heureCreneau, dureeMinutes: objectifMinutes) { enregistre in
+                montrerAgenda = false
+                if enregistre { etape = 4 }
+            }
+            .ignoresSafeArea()
+        }
+    }
+
+    // MARK: Étape 4 — le clavier
 
     private var clavier: some View {
         VStack(spacing: 0) {
@@ -165,7 +215,7 @@ struct OnboardingView: View {
                 .frame(maxWidth: 290)
                 .padding(.top, 10)
             Spacer()
-            pointsDePage(actif: 3)
+            pointsDePage(actif: 4)
                 .padding(.bottom, 22)
             BoutonPilule(titre: "Commencer à pratiquer") { terminer(objectifMinutes) }
         }
@@ -175,7 +225,7 @@ struct OnboardingView: View {
 
     private func pointsDePage(actif: Int) -> some View {
         HStack(spacing: 6) {
-            ForEach(1...3, id: \.self) { i in
+            ForEach(1...4, id: \.self) { i in
                 Capsule()
                     .fill(i == actif ? Nocturne.accent : Nocturne.neutre600)
                     .frame(width: i == actif ? 18 : 5, height: 5)
