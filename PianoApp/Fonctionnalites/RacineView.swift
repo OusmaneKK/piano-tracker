@@ -73,6 +73,10 @@ struct RacineView: View {
         }
         .foregroundStyle(Nocturne.texte)
         .task { sessionVM.configurer(contexte: contexte) }
+        // L'écran ne se met pas en veille pendant qu'une session tourne.
+        .onChange(of: sessionVM.enCours) { _, enCours in
+            UIApplication.shared.isIdleTimerDisabled = enCours
+        }
         .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .active: sessionVM.rafraichir()
