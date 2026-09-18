@@ -8,6 +8,7 @@ struct AujourdhuiView: View {
 
     @Query(sort: \SessionPratique.date) private var sessions: [SessionPratique]
     @State private var montrerAgenda = false
+    @State private var montrerQuiz = false
 
     var body: some View {
         ScrollView {
@@ -20,6 +21,9 @@ struct AujourdhuiView: View {
             .padding(.horizontal, 20)
             .padding(.top, 10)
             .padding(.bottom, 24)
+        }
+        .fullScreenCover(isPresented: $montrerQuiz) {
+            QuizView()
         }
         .sheet(isPresented: $montrerAgenda) {
             EditeurCreneauAgenda(heure: Calendar.current.date(bySettingHour: 19, minute: 0,
@@ -169,6 +173,12 @@ struct AujourdhuiView: View {
             Text("Continuer")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(Nocturne.neutre300)
+            ligneSuggestion(icone: "music.note", fondIcone: Nocturne.accent900,
+                            teinteIcone: Nocturne.accent300,
+                            titre: "Quiz de notes",
+                            sousTitre: "Lire la clé de sol · série de 10") {
+                montrerQuiz = true
+            }
             ligneSuggestion(icone: "music.note.list", fondIcone: Nocturne.accent900,
                             teinteIcone: Nocturne.accent300,
                             titre: "Clair de Lune — Section B",
