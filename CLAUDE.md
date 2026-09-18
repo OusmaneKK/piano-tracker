@@ -82,9 +82,11 @@ PianoAppTests/
   (jour passé + durée), suppression avec confirmation.
 
 ### 6. Quiz de notes (première fonctionnalité post-MVP, design « mini-clavier »)
-- Accès depuis Aujourd'hui, plein écran. Clé de sol, notes naturelles Do4–Fa5.
-- Réponse en touchant la touche du mini-clavier (une octave ; touches noires
-  décoratives en v1 — elles s'activeront avec les altérations puis le MIDI).
+- Accès depuis Aujourd'hui, plein écran. Réglages avant la série : clé de sol
+  (Do4–Fa5) ou clé de fa (Sol2–Do4, le Do central au-dessus), altérations ♯/♭
+  en option (~1 question sur 3 ; enharmonie : Sol♯ et La♭ = la même touche noire).
+- Réponse en touchant la touche du mini-clavier (une octave complète, touches
+  noires actives quand les altérations le sont).
 - Série de 10, score final, bandeau pédagogique (« C'était La — 2ᵉ interligne »).
 - Le quiz n'entame pas le compteur des 10 000 heures (théorie ≠ pratique).
 

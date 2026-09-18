@@ -6,17 +6,22 @@ import Observation
 final class QuizViewModel {
     enum Phase: Equatable {
         case question
-        case repondu(choix: NomNote, juste: Bool)
+        case repondu(choix: Touche, juste: Bool)
         case termine
     }
+
+    let cle: Cle
+    let avecAlterations: Bool
 
     private(set) var note: NotePortee
     private(set) var numero = 1
     private(set) var score = 0
     private(set) var phase: Phase = .question
 
-    init() {
-        note = QuizNotes.tirer(differenteDe: nil)
+    init(cle: Cle, avecAlterations: Bool) {
+        self.cle = cle
+        self.avecAlterations = avecAlterations
+        note = QuizNotes.tirer(cle: cle, avecAlterations: avecAlterations, differenteDe: nil)
     }
 
     var estRepondu: Bool {
@@ -24,9 +29,9 @@ final class QuizViewModel {
         return false
     }
 
-    func repondre(_ choix: NomNote) {
+    func repondre(_ choix: Touche) {
         guard phase == .question else { return }
-        let juste = choix == note.nom
+        let juste = choix == note.toucheAttendue
         if juste { score += 1 }
         phase = .repondu(choix: choix, juste: juste)
         // La lecture du bandeau demande un peu plus de temps après une erreur.
@@ -39,7 +44,7 @@ final class QuizViewModel {
     func rejouer() {
         score = 0
         numero = 1
-        note = QuizNotes.tirer(differenteDe: note)
+        note = QuizNotes.tirer(cle: cle, avecAlterations: avecAlterations, differenteDe: note)
         phase = .question
     }
 
@@ -50,7 +55,7 @@ final class QuizViewModel {
             return
         }
         numero += 1
-        note = QuizNotes.tirer(differenteDe: note)
+        note = QuizNotes.tirer(cle: cle, avecAlterations: avecAlterations, differenteDe: note)
         phase = .question
     }
 }
