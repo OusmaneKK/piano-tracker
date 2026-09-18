@@ -176,7 +176,7 @@ struct AujourdhuiView: View {
             ligneSuggestion(icone: "music.note", fondIcone: Nocturne.accent900,
                             teinteIcone: Nocturne.accent300,
                             titre: "Quiz de notes",
-                            sousTitre: "Lire la clé de sol · série de 10") {
+                            sousTitre: "Clés de sol et de fa · altérations · série de 10") {
                 montrerQuiz = true
             }
             ligneSuggestion(icone: "music.note.list", fondIcone: Nocturne.accent900,

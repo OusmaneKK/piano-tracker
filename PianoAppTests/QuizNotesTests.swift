@@ -23,9 +23,9 @@ final class QuizNotesTests: XCTestCase {
     func testDo4SousLaPortee() {
         let do4 = NotePortee(nom: .do, octave: 4)
         XCTAssertEqual(do4.position, -2)
-        XCTAssertTrue(do4.ligneSupplementaire)
-        XCTAssertFalse(NotePortee(nom: .re, octave: 4).ligneSupplementaire)
-        XCTAssertFalse(NotePortee(nom: .mi, octave: 4).ligneSupplementaire)
+        XCTAssertTrue(do4.ligneSupplementaireBas)
+        XCTAssertFalse(NotePortee(nom: .re, octave: 4).ligneSupplementaireBas)
+        XCTAssertFalse(NotePortee(nom: .mi, octave: 4).ligneSupplementaireBas)
     }
 
     func testDirectionDeLaHampe() {
@@ -48,27 +48,112 @@ final class QuizNotesTests: XCTestCase {
                        "suspendu sous la portée")
     }
 
+    // MARK: Clé de fa
+
+    func testPositionsEnCleDeFa() {
+        XCTAssertEqual(NotePortee(nom: .sol, octave: 2, cle: .fa).position, 0)   // 1ʳᵉ ligne
+        XCTAssertEqual(NotePortee(nom: .re, octave: 3, cle: .fa).position, 4)    // 3ᵉ ligne
+        XCTAssertEqual(NotePortee(nom: .la, octave: 3, cle: .fa).position, 8)    // 5ᵉ ligne
+        XCTAssertEqual(NotePortee(nom: .do, octave: 4, cle: .fa).position, 10)   // au-dessus
+    }
+
+    func testDoCentralDansLesDeuxCles() {
+        // Le Do central (Do4) : petite ligne sous la portée en clé de sol,
+        // petite ligne au-dessus en clé de fa.
+        let enSol = NotePortee(nom: .do, octave: 4, cle: .sol)
+        let enFa = NotePortee(nom: .do, octave: 4, cle: .fa)
+        XCTAssertTrue(enSol.ligneSupplementaireBas)
+        XCTAssertFalse(enSol.ligneSupplementaireHaut)
+        XCTAssertTrue(enFa.ligneSupplementaireHaut)
+        XCTAssertFalse(enFa.ligneSupplementaireBas)
+        XCTAssertEqual(enFa.libellePosition, "sur la petite ligne au-dessus de la portée")
+    }
+
+    // MARK: Altérations et touches
+
+    func testToucheAttendue() {
+        XCTAssertEqual(NotePortee(nom: .sol, octave: 4).toucheAttendue, .blanche(.sol))
+        XCTAssertEqual(NotePortee(nom: .sol, octave: 4, alteration: .diese).toucheAttendue,
+                       .noire(entre: .sol))
+        XCTAssertEqual(NotePortee(nom: .la, octave: 4, alteration: .bemol).toucheAttendue,
+                       .noire(entre: .sol))
+    }
+
+    func testEnharmonie() {
+        // Sol♯ et La♭ : la même touche noire répond juste aux deux.
+        let solDiese = NotePortee(nom: .sol, octave: 4, alteration: .diese)
+        let laBemol = NotePortee(nom: .la, octave: 4, alteration: .bemol)
+        XCTAssertEqual(solDiese.toucheAttendue, laBemol.toucheAttendue)
+        XCTAssertNotEqual(solDiese.nomComplet, laBemol.nomComplet)
+    }
+
+    func testNomComplet() {
+        XCTAssertEqual(NotePortee(nom: .fa, octave: 4, alteration: .diese).nomComplet, "Fa♯")
+        XCTAssertEqual(NotePortee(nom: .si, octave: 4, alteration: .bemol).nomComplet, "Si♭")
+        XCTAssertEqual(NotePortee(nom: .mi, octave: 4).nomComplet, "Mi")
+    }
+
     // MARK: Périmètre et tirage
 
     func testPerimetreDesNotes() {
-        XCTAssertEqual(QuizNotes.notes.count, 11)
-        XCTAssertEqual(QuizNotes.notes.first, NotePortee(nom: .do, octave: 4))
-        XCTAssertEqual(QuizNotes.notes.last, NotePortee(nom: .fa, octave: 5))
-        // Toutes tiennent sur la portée élargie : de Do4 (-2) à Fa5 (8).
-        for note in QuizNotes.notes {
-            XCTAssertTrue((-2...8).contains(note.position), "\(note.nom.rawValue)\(note.octave)")
+        for cle in Cle.allCases {
+            let notes = QuizNotes.notes(cle: cle)
+            XCTAssertEqual(notes.count, 11, "\(cle.libelle)")
+            for note in notes {
+                XCTAssertTrue((-2...10).contains(note.position),
+                              "\(note.nomComplet)\(note.octave) en \(cle.libelle)")
+                XCTAssertEqual(note.cle, cle)
+            }
         }
+        XCTAssertEqual(QuizNotes.notes(cle: .sol).first, NotePortee(nom: .do, octave: 4))
+        XCTAssertEqual(QuizNotes.notes(cle: .fa).last, NotePortee(nom: .do, octave: 4, cle: .fa))
     }
 
-    func testTirageEviteLaRepetitionDuNom() {
+    func testTirageEviteLaRepetitionDuNomComplet() {
         var generateur = GenerateurTest(etat: 42)
         var precedente: NotePortee? = nil
         for _ in 0..<200 {
-            let note = QuizNotes.tirer(differenteDe: precedente, avec: &generateur)
-            XCTAssertNotEqual(note.nom, precedente?.nom)
-            XCTAssertTrue(QuizNotes.notes.contains(note))
+            let note = QuizNotes.tirer(cle: .sol, avecAlterations: true,
+                                       differenteDe: precedente, avec: &generateur)
+            XCTAssertNotEqual(note.nomComplet, precedente?.nomComplet)
             precedente = note
         }
+    }
+
+    func testTirageSansAlterationsResteNaturel() {
+        var generateur = GenerateurTest(etat: 9)
+        var precedente: NotePortee? = nil
+        for _ in 0..<100 {
+            let note = QuizNotes.tirer(cle: .fa, avecAlterations: false,
+                                       differenteDe: precedente, avec: &generateur)
+            XCTAssertEqual(note.alteration, .naturelle)
+            XCTAssertEqual(note.cle, .fa)
+            precedente = note
+        }
+    }
+
+    func testTirageAltereRespecteLesTouchesNoires() {
+        var generateur = GenerateurTest(etat: 3)
+        var precedente: NotePortee? = nil
+        var nbAlterees = 0
+        for _ in 0..<300 {
+            let note = QuizNotes.tirer(cle: .sol, avecAlterations: true,
+                                       differenteDe: precedente, avec: &generateur)
+            switch note.alteration {
+            case .diese:
+                nbAlterees += 1
+                XCTAssertTrue(QuizNotes.nomsDiese.contains(note.nom), note.nomComplet)
+            case .bemol:
+                nbAlterees += 1
+                XCTAssertTrue(QuizNotes.nomsBemol.contains(note.nom), note.nomComplet)
+            case .naturelle:
+                break
+            }
+            precedente = note
+        }
+        // Environ une question sur trois est altérée : large fourchette, sans hasard flou.
+        XCTAssertGreaterThan(nbAlterees, 40)
+        XCTAssertLessThan(nbAlterees, 180)
     }
 
     func testTirageCouvreLesOnzeNotes() {
@@ -76,11 +161,12 @@ final class QuizNotesTests: XCTestCase {
         var vues = Set<Int>()
         var precedente: NotePortee? = nil
         for _ in 0..<300 {
-            let note = QuizNotes.tirer(differenteDe: precedente, avec: &generateur)
+            let note = QuizNotes.tirer(cle: .sol, avecAlterations: false,
+                                       differenteDe: precedente, avec: &generateur)
             vues.insert(note.position)
             precedente = note
         }
-        XCTAssertEqual(vues.count, QuizNotes.notes.count)
+        XCTAssertEqual(vues.count, QuizNotes.notes(cle: .sol).count)
     }
 }
 
