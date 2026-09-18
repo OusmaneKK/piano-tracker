@@ -33,6 +33,7 @@ PianoApp/
     Progression.swift  pourcentage, prochain jalon, série (tolérance 1 jour), prévisions
     FormatTemps.swift  mm:ss, heures localisées
     QuizNotes.swift    notes en clé de sol (Do4–Fa5), positions sur la portée, tirage
+    SuiviMIDI.swift    comptage automatique : seuil de silence, date de pause
   Fonctionnalites/
     RacineView.swift   barre d'onglets custom + aiguillage onboarding
     Onboarding/        4 étapes : principe, objectif quotidien, créneau agenda, clavier
@@ -70,6 +71,9 @@ PianoAppTests/
 - Grand anneau (cible visuelle 25 min), timer mm:ss, lecture/pause, remise à zéro, terminer.
 - Le timer survit au changement d'onglet (état porté par la racine).
 - Terminer enregistre une `SessionPratique` (durée ≥ 60 s) en SwiftData.
+- Comptage automatique (clavier MIDI branché) : la première note démarre la
+  session, 2 minutes de silence la mettent en pause — rétroactivement à la
+  dernière note, pour que le silence ne soit jamais compté comme pratique.
 
 ### 4. Parcours
 - Total d'heures investies, pourcentage de la route, rythme hebdomadaire.
@@ -99,9 +103,11 @@ PianoAppTests/
 
 ## Hors périmètre du MVP (ne pas implémenter, ne pas préparer « au cas où »)
 - Détection audio, métronome fonctionnel (les mentions à l'écran restent du texte).
-  **Exception actée (2026-09-18)** : la connexion CoreMIDI/Bluetooth est réelle pour
-  répondre au quiz de notes (note jouée = touche pressée, l'octave est ignorée).
-  Le comptage automatique des minutes de pratique via MIDI reste hors périmètre.
+  **Exception actée (2026-09-18)** : le MIDI (CoreMIDI / Bluetooth) est réel — il
+  répond au quiz de notes (note jouée = touche pressée, l'octave est ignorée) et
+  pilote le comptage automatique des sessions. Le clavier ne compte que l'app au
+  premier plan : iOS suspend les apps en arrière-plan, et l'écran reste allumé
+  pendant qu'on attend ou qu'on joue.
 - Lecture de partition complète (le quiz de notes v1 existe ; altérations,
   clé de fa et partitions restent à venir)
 - Routines hebdomadaires, planning, notifications.

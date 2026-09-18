@@ -10,11 +10,22 @@ final class GestionnaireMIDI {
     private(set) var nbSources = 0
     var estConnecte: Bool { nbSources > 0 }
 
-    /// Appelée sur le fil principal avec le numéro de note MIDI (60 = Do central).
-    @ObservationIgnored var surNote: ((UInt8) -> Void)?
+    /// Les abonnés aux notes jouées, par clé (« session », « quiz »…) :
+    /// plusieurs écrans peuvent écouter le clavier en même temps.
+    @ObservationIgnored private var abonnes: [String: (UInt8) -> Void] = [:]
 
     @ObservationIgnored private var client = MIDIClientRef()
     @ObservationIgnored private var port = MIDIPortRef()
+
+    /// Reçoit chaque note jouée (60 = Do central), sur le fil principal.
+    /// Un nouvel abonnement remplace le précédent portant la même clé.
+    func abonner(_ cle: String, _ action: @escaping (UInt8) -> Void) {
+        abonnes[cle] = action
+    }
+
+    func desabonner(_ cle: String) {
+        abonnes[cle] = nil
+    }
 
     func demarrer() {
         guard client == 0 else {
@@ -52,7 +63,8 @@ final class GestionnaireMIDI {
                     let velocite = mot & 0x7F
                     guard velocite > 0 else { continue }             // vélocité 0 = note-off
                     DispatchQueue.main.async { [weak self] in
-                        self?.surNote?(note)
+                        guard let self else { return }
+                        for prevenir in abonnes.values { prevenir(note) }
                     }
                 }
             }

@@ -8,6 +8,7 @@ struct SessionView: View {
     var terminer: () -> Void
 
     @Environment(\.modelContext) private var contexte
+    @Environment(GestionnaireMIDI.self) private var midi
     @State private var confirmerRemiseAZero = false
 
     var body: some View {
@@ -67,9 +68,13 @@ struct SessionView: View {
                 }
             }
 
-            HStack(spacing: 10) {
-                pastille(icone: "metronome", texte: "72 bpm")
-                pastille(icone: "pianokeys", texte: "MIDI à venir")
+            if midi.estConnecte {
+                carteComptageAutomatique
+            } else {
+                HStack(spacing: 10) {
+                    pastille(icone: "metronome", texte: "72 bpm")
+                    pastille(icone: "pianokeys", texte: "Clavier non connecté")
+                }
             }
 
             Spacer(minLength: 0)
@@ -85,6 +90,31 @@ struct SessionView: View {
         } message: {
             Text("Le temps écoulé ne sera pas enregistré.")
         }
+    }
+
+    /// Le clavier est branché : il peut piloter la session tout seul.
+    private var carteComptageAutomatique: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "pianokeys")
+                .font(.system(size: 19))
+                .foregroundStyle(vm.suiviMIDIArme ? Nocturne.accent300 : Nocturne.neutre400)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Comptage automatique")
+                    .font(.system(size: 14, weight: .medium))
+                Text(vm.suiviMIDIArme
+                     ? "Joue — je démarre, et le silence met en pause"
+                     : "Laisse ton clavier lancer la session")
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(vm.suiviMIDIArme ? Nocturne.accent300 : Nocturne.neutre400)
+            }
+            Spacer(minLength: 0)
+            Toggle("Comptage automatique", isOn: $vm.suiviMIDIArme)
+                .labelsHidden()
+                .tint(Nocturne.accent)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .carteNocturne()
     }
 
     private func boutonSecondaire(icone: String, action: @escaping () -> Void) -> some View {

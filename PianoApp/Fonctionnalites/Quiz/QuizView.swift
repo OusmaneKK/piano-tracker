@@ -7,7 +7,7 @@ struct QuizView: View {
     @State private var cle: Cle = .sol
     @State private var avecAlterations = false
     @State private var vm: QuizViewModel?
-    @State private var midi = GestionnaireMIDI()
+    @Environment(GestionnaireMIDI.self) private var midi
     @State private var montrerBluetooth = false
 
     var body: some View {
@@ -25,6 +25,7 @@ struct QuizView: View {
         }
         .foregroundStyle(Nocturne.texte)
         .task { midi.demarrer() }
+        .onDisappear { midi.desabonner("quiz") }
         .sheet(isPresented: $montrerBluetooth) {
             ConnexionBluetoothMIDI()
                 .ignoresSafeArea()
@@ -35,7 +36,7 @@ struct QuizView: View {
     private func commencerSerie() {
         let nouveau = QuizViewModel(cle: cle, avecAlterations: avecAlterations)
         vm = nouveau
-        midi.surNote = { [weak nouveau] noteMIDI in
+        midi.abonner("quiz") { [weak nouveau] noteMIDI in
             nouveau?.repondre(Touche.depuisNoteMIDI(noteMIDI))
         }
     }

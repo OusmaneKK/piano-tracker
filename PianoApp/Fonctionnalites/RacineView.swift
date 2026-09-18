@@ -42,6 +42,7 @@ struct RacineView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var onglet: Onglet = .aujourdhui
     @State private var sessionVM = SessionViewModel()
+    @State private var midi = GestionnaireMIDI()
 
     private var profil: Profil? { profils.first }
 
@@ -72,11 +73,16 @@ struct RacineView: View {
             }
         }
         .foregroundStyle(Nocturne.texte)
-        .task { sessionVM.configurer(contexte: contexte) }
-        // L'écran ne se met pas en veille pendant qu'une session tourne.
-        .onChange(of: sessionVM.enCours) { _, enCours in
-            UIApplication.shared.isIdleTimerDisabled = enCours
+        .environment(midi)
+        .task {
+            sessionVM.configurer(contexte: contexte)
+            midi.demarrer()
+            midi.abonner("session") { _ in sessionVM.noteJouee() }
         }
+        // L'écran ne se met pas en veille pendant qu'une session tourne, ni
+        // pendant qu'on attend les premières notes du clavier.
+        .onChange(of: sessionVM.enCours) { _, _ in majVeille() }
+        .onChange(of: sessionVM.suiviMIDIArme) { _, _ in majVeille() }
         .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .active: sessionVM.rafraichir()
@@ -116,6 +122,10 @@ struct RacineView: View {
         .overlay(alignment: .top) {
             Rectangle().fill(Nocturne.neutre800).frame(height: 1)
         }
+    }
+
+    private func majVeille() {
+        UIApplication.shared.isIdleTimerDisabled = sessionVM.enCours || sessionVM.suiviMIDIArme
     }
 
     private func terminerOnboarding(objectifMinutes: Int) {
