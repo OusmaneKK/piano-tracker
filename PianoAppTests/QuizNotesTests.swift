@@ -93,6 +93,21 @@ final class QuizNotesTests: XCTestCase {
         XCTAssertEqual(NotePortee(nom: .mi, octave: 4).nomComplet, "Mi")
     }
 
+    // MARK: MIDI
+
+    func testToucheDepuisNoteMIDI() {
+        XCTAssertEqual(Touche.depuisNoteMIDI(60), .blanche(.do))       // Do central
+        XCTAssertEqual(Touche.depuisNoteMIDI(61), .noire(entre: .do))  // Do♯/Ré♭
+        XCTAssertEqual(Touche.depuisNoteMIDI(64), .blanche(.mi))
+        XCTAssertEqual(Touche.depuisNoteMIDI(66), .noire(entre: .fa))  // Fa♯/Sol♭
+        XCTAssertEqual(Touche.depuisNoteMIDI(71), .blanche(.si))
+        // L'octave est ignorée : n'importe quel Do répond pour Do.
+        XCTAssertEqual(Touche.depuisNoteMIDI(36), Touche.depuisNoteMIDI(96))
+        // Une note MIDI jouée répond juste à la note enharmonique affichée.
+        let laBemol = NotePortee(nom: .la, octave: 4, alteration: .bemol)
+        XCTAssertEqual(Touche.depuisNoteMIDI(68), laBemol.toucheAttendue) // Sol♯3... = La♭
+    }
+
     // MARK: Périmètre et tirage
 
     func testPerimetreDesNotes() {

@@ -7,6 +7,8 @@ struct QuizView: View {
     @State private var cle: Cle = .sol
     @State private var avecAlterations = false
     @State private var vm: QuizViewModel?
+    @State private var midi = GestionnaireMIDI()
+    @State private var montrerBluetooth = false
 
     var body: some View {
         ZStack {
@@ -22,6 +24,20 @@ struct QuizView: View {
             }
         }
         .foregroundStyle(Nocturne.texte)
+        .task { midi.demarrer() }
+        .sheet(isPresented: $montrerBluetooth) {
+            ConnexionBluetoothMIDI()
+                .ignoresSafeArea()
+        }
+    }
+
+    /// Lance une série et branche le clavier MIDI dessus : note jouée = touche.
+    private func commencerSerie() {
+        let nouveau = QuizViewModel(cle: cle, avecAlterations: avecAlterations)
+        vm = nouveau
+        midi.surNote = { [weak nouveau] noteMIDI in
+            nouveau?.repondre(Touche.depuisNoteMIDI(noteMIDI))
+        }
     }
 
     // MARK: Réglages de la série
@@ -60,10 +76,36 @@ struct QuizView: View {
             .carteNocturne()
             .padding(.top, 10)
 
-            Spacer()
-            BoutonPilule(titre: "Commencer la série") {
-                vm = QuizViewModel(cle: cle, avecAlterations: avecAlterations)
+            HStack(spacing: 14) {
+                Image(systemName: "pianokeys")
+                    .font(.system(size: 19))
+                    .foregroundStyle(midi.estConnecte ? Nocturne.accent300 : Nocturne.neutre400)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Clavier MIDI")
+                        .font(.system(size: 15, weight: .medium))
+                    Text(midi.estConnecte
+                         ? "Connecté — joue les notes pour répondre"
+                         : "Réponds en jouant les vraies touches")
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(midi.estConnecte ? Nocturne.accent300 : Nocturne.neutre400)
+                }
+                Spacer()
+                if !midi.estConnecte {
+                    Button("Bluetooth…") { montrerBluetooth = true }
+                        .font(.system(size: 12.5))
+                        .foregroundStyle(Nocturne.accent300)
+                        .padding(.horizontal, 11)
+                        .padding(.vertical, 6)
+                        .overlay(Capsule().strokeBorder(Nocturne.accent700, lineWidth: 1))
+                }
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .carteNocturne()
+            .padding(.top, 10)
+
+            Spacer()
+            BoutonPilule(titre: "Commencer la série") { commencerSerie() }
         }
         .padding(.horizontal, 26)
         .padding(.top, 14)
@@ -120,6 +162,11 @@ struct QuizView: View {
                     .font(.system(size: 12))
                     .monospacedDigit()
                     .foregroundStyle(Nocturne.neutre400)
+                if midi.estConnecte {
+                    Image(systemName: "pianokeys")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Nocturne.accent300)
+                }
             }
             Kicker(texte: "Quiz de notes · \(vm.cle.libelle)")
                 .padding(.top, 24)
