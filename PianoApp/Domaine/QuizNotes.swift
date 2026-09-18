@@ -38,6 +38,25 @@ enum Touche: Equatable, Hashable {
     case blanche(NomNote)
     /// La touche noire à droite de la touche blanche donnée (Do♯/Ré♭ = noire(entre: .do)).
     case noire(entre: NomNote)
+
+    /// La touche d'octave correspondant à une note MIDI (60 = Do central).
+    /// L'octave jouée est ignorée : n'importe quel Do répond pour Do.
+    static func depuisNoteMIDI(_ noteMIDI: UInt8) -> Touche {
+        switch Int(noteMIDI) % 12 {
+        case 0: .blanche(.do)
+        case 1: .noire(entre: .do)
+        case 2: .blanche(.re)
+        case 3: .noire(entre: .re)
+        case 4: .blanche(.mi)
+        case 5: .blanche(.fa)
+        case 6: .noire(entre: .fa)
+        case 7: .blanche(.sol)
+        case 8: .noire(entre: .sol)
+        case 9: .blanche(.la)
+        case 10: .noire(entre: .la)
+        default: .blanche(.si)
+        }
+    }
 }
 
 /// Une note posée sur une portée.
