@@ -45,10 +45,16 @@ PianoApp/
     Statistiques/      tuiles, barres hebdo, prévision
   Persistance/         modèles SwiftData : SessionPratique, Profil
   Ressources/          Assets.xcassets
+Partage/               code compilé dans l'app ET dans le widget
+  ResumePratique.swift résumé du jour + dépôt/lecture dans le trousseau partagé
+OstinatoWidget/        extension WidgetKit (écran verrouillé + écran d'accueil)
+Config/                entitlements des deux cibles, Info.plist du widget
 PianoAppTests/
   ProgressionTests.swift
   FormatTempsTests.swift
   QuizNotesTests.swift
+  SuiviMIDITests.swift
+  ResumePratiqueTests.swift
 ```
 
 ## Fonctionnalités du MVP (dans l'ordre)
@@ -95,6 +101,14 @@ PianoAppTests/
 - Série de 10, score final, bandeau pédagogique (« C'était La — 2ᵉ interligne »).
 - Un clavier MIDI (Bluetooth ou USB) répond au quiz : note jouée = touche pressée.
 - Le quiz n'entame pas le compteur des 10 000 heures (théorie ≠ pratique).
+
+### 7. Widget (écran verrouillé et écran d'accueil)
+- Anneau des minutes du jour, série, pourcentage de la route.
+- L'app dépose un `ResumePratique` (quelques nombres) dans un **groupe de
+  trousseau partagé**, faute d'App Group : celui-ci demande un compte
+  développeur payant, le trousseau non. À remplacer par un App Group + store
+  SwiftData partagé le jour d'un compte payant.
+- Le widget ne lit jamais la base SwiftData : il n'a que le résumé.
 
 ### Règles du domaine
 - La série (« jours consécutifs avec au moins une session ») tolère **une** journée manquée

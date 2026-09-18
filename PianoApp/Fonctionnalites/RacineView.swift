@@ -38,6 +38,7 @@ enum Onglet: CaseIterable {
 /// (pour qu'il survive aux changements d'onglet).
 struct RacineView: View {
     @Query private var profils: [Profil]
+    @Query private var sessions: [SessionPratique]
     @Environment(\.modelContext) private var contexte
     @Environment(\.scenePhase) private var scenePhase
     @State private var onglet: Onglet = .aujourdhui
@@ -78,7 +79,12 @@ struct RacineView: View {
             sessionVM.configurer(contexte: contexte)
             midi.demarrer()
             midi.abonner("session") { _ in sessionVM.noteJouee() }
+            publierResume()
         }
+        // Le widget suit l'historique : une session enregistrée ou supprimée
+        // le met à jour, comme le passage en arrière-plan.
+        .onChange(of: sessions.count) { _, _ in publierResume() }
+        .onChange(of: profil?.objectifQuotidienMinutes) { _, _ in publierResume() }
         // L'écran ne se met pas en veille pendant qu'une session tourne, ni
         // pendant qu'on attend les premières notes du clavier.
         .onChange(of: sessionVM.enCours) { _, _ in majVeille() }
@@ -86,7 +92,9 @@ struct RacineView: View {
         .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .active: sessionVM.rafraichir()
-            case .background: sessionVM.sauvegarder()
+            case .background:
+                sessionVM.sauvegarder()
+                publierResume()
             default: break
             }
         }
@@ -122,6 +130,10 @@ struct RacineView: View {
         .overlay(alignment: .top) {
             Rectangle().fill(Nocturne.neutre800).frame(height: 1)
         }
+    }
+
+    private func publierResume() {
+        ResumePratique.publier(sessions: sessions, profil: profil)
     }
 
     private func majVeille() {
