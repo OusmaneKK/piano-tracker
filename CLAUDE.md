@@ -32,11 +32,13 @@ PianoApp/
     Jalon.swift        les 7 jalons de la route des 10 000 heures
     Progression.swift  pourcentage, prochain jalon, série (tolérance 1 jour), prévisions
     FormatTemps.swift  mm:ss, heures localisées
+    QuizNotes.swift    notes en clé de sol (Do4–Fa5), positions sur la portée, tirage
   Fonctionnalites/
     RacineView.swift   barre d'onglets custom + aiguillage onboarding
     Onboarding/        4 étapes : principe, objectif quotidien, créneau agenda, clavier
     Aujourdhui/        anneau d'objectif, route des 10 000 h, suggestions
     Session/           SessionView + SessionViewModel (timer)
+    Quiz/              QuizView + QuizViewModel (lecture de notes, série de 10)
     Parcours/          heures investies + frise des jalons
     Statistiques/      tuiles, barres hebdo, prévision
   Persistance/         modèles SwiftData : SessionPratique, Profil
@@ -44,6 +46,7 @@ PianoApp/
 PianoAppTests/
   ProgressionTests.swift
   FormatTempsTests.swift
+  QuizNotesTests.swift
 ```
 
 ## Fonctionnalités du MVP (dans l'ordre)
@@ -78,6 +81,13 @@ PianoAppTests/
 - Historique : dernières sessions, ajout manuel d'une session oubliée
   (jour passé + durée), suppression avec confirmation.
 
+### 6. Quiz de notes (première fonctionnalité post-MVP, design « mini-clavier »)
+- Accès depuis Aujourd'hui, plein écran. Clé de sol, notes naturelles Do4–Fa5.
+- Réponse en touchant la touche du mini-clavier (une octave ; touches noires
+  décoratives en v1 — elles s'activeront avec les altérations puis le MIDI).
+- Série de 10, score final, bandeau pédagogique (« C'était La — 2ᵉ interligne »).
+- Le quiz n'entame pas le compteur des 10 000 heures (théorie ≠ pratique).
+
 ### Règles du domaine
 - La série (« jours consécutifs avec au moins une session ») tolère **une** journée manquée
   si l'utilisateur reprend le lendemain. Le but est de tenir des mois, pas de culpabiliser.
@@ -85,7 +95,8 @@ PianoAppTests/
 
 ## Hors périmètre du MVP (ne pas implémenter, ne pas préparer « au cas où »)
 - MIDI / Bluetooth réels, détection audio, métronome fonctionnel (les mentions à l'écran restent du texte)
-- Lecture de partition, quiz de notes (prochaine grande fonctionnalité, après le MVP)
+- Lecture de partition complète (le quiz de notes v1 existe ; altérations,
+  clé de fa et partitions restent à venir)
 - Routines hebdomadaires, planning, notifications.
   **Exception actée (2026-09-18)** : l'écriture d'un événement récurrent « créneau
   quotidien » via la fiche système EventKitUI (aucune permission requise sur iOS 17+).
