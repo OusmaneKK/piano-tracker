@@ -75,6 +75,8 @@ PianoAppTests/
 - Tuiles : heures cette semaine, moyenne quotidienne, série, heures totales.
 - Barres des 7 derniers jours (minutes/jour), aujourd'hui en accent.
 - Prévision « à ce rythme » calculée sur le rythme réel.
+- Historique : dernières sessions, ajout manuel d'une session oubliée
+  (jour passé + durée), suppression avec confirmation.
 
 ### Règles du domaine
 - La série (« jours consécutifs avec au moins une session ») tolère **une** journée manquée
