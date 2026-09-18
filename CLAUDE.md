@@ -39,6 +39,7 @@ PianoApp/
     Aujourdhui/        anneau d'objectif, route des 10 000 h, suggestions
     Session/           SessionView + SessionViewModel (timer)
     Quiz/              QuizView + QuizViewModel (lecture de notes, série de 10)
+    MIDI/              GestionnaireMIDI (CoreMIDI) + appairage Bluetooth (CoreAudioKit)
     Parcours/          heures investies + frise des jalons
     Statistiques/      tuiles, barres hebdo, prévision
   Persistance/         modèles SwiftData : SessionPratique, Profil
@@ -88,6 +89,7 @@ PianoAppTests/
 - Réponse en touchant la touche du mini-clavier (une octave complète, touches
   noires actives quand les altérations le sont).
 - Série de 10, score final, bandeau pédagogique (« C'était La — 2ᵉ interligne »).
+- Un clavier MIDI (Bluetooth ou USB) répond au quiz : note jouée = touche pressée.
 - Le quiz n'entame pas le compteur des 10 000 heures (théorie ≠ pratique).
 
 ### Règles du domaine
@@ -96,7 +98,10 @@ PianoAppTests/
 - Les prévisions se basent sur le rythme réel des 4 dernières semaines ; à défaut, sur l'objectif quotidien.
 
 ## Hors périmètre du MVP (ne pas implémenter, ne pas préparer « au cas où »)
-- MIDI / Bluetooth réels, détection audio, métronome fonctionnel (les mentions à l'écran restent du texte)
+- Détection audio, métronome fonctionnel (les mentions à l'écran restent du texte).
+  **Exception actée (2026-09-18)** : la connexion CoreMIDI/Bluetooth est réelle pour
+  répondre au quiz de notes (note jouée = touche pressée, l'octave est ignorée).
+  Le comptage automatique des minutes de pratique via MIDI reste hors périmètre.
 - Lecture de partition complète (le quiz de notes v1 existe ; altérations,
   clé de fa et partitions restent à venir)
 - Routines hebdomadaires, planning, notifications.

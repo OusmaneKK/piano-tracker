@@ -207,7 +207,7 @@ struct OnboardingView: View {
             Text("Connecte ton clavier")
                 .font(.system(size: 22, weight: .medium))
                 .padding(.top, 22)
-            Text("Bientôt : branché en MIDI ou Bluetooth, chaque minute jouée sera comptée automatiquement. En attendant, le timer de session s'en charge — sans rien oublier.")
+            Text("Branche-le en Bluetooth MIDI et réponds au quiz de notes en jouant les vraies touches. Le comptage automatique des minutes arrive ensuite — en attendant, le timer de session s'en charge.")
                 .font(.system(size: 13.5))
                 .foregroundStyle(Nocturne.neutre300)
                 .multilineTextAlignment(.center)
