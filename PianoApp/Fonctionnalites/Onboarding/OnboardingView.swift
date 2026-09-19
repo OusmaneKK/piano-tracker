@@ -2,8 +2,9 @@ import SwiftUI
 
 /// Onboarding en quatre étapes : le principe, l'objectif quotidien, le créneau, le clavier.
 struct OnboardingView: View {
-    /// Appelé à la fin avec l'objectif quotidien choisi (en minutes).
-    var terminer: (Int) -> Void
+    /// Appelé à la fin avec l'objectif quotidien (minutes) et l'heure du
+    /// créneau choisie (minutes depuis minuit).
+    var terminer: (Int, Int) -> Void
 
     @State private var etape = 1
     @State private var objectifMinutes = 60
@@ -75,7 +76,11 @@ struct OnboardingView: View {
 
             VStack(spacing: 10) {
                 ForEach(Self.options, id: \.minutes) { option in
-                    ligneOption(option.minutes, option.sousTitre)
+                    LigneOption(titre: "\(option.minutes) minutes",
+                                sousTitre: option.sousTitre,
+                                choisi: objectifMinutes == option.minutes) {
+                        objectifMinutes = option.minutes
+                    }
                 }
             }
             .padding(.top, 22)
@@ -100,38 +105,10 @@ struct OnboardingView: View {
         }
     }
 
-    private func ligneOption(_ minutes: Int, _ sousTitre: String) -> some View {
-        let choisi = objectifMinutes == minutes
-        return Button {
-            objectifMinutes = minutes
-        } label: {
-            HStack(spacing: 14) {
-                Circle()
-                    .strokeBorder(choisi ? Nocturne.accent : Nocturne.neutre500, lineWidth: 2)
-                    .background(Circle().fill(choisi ? Nocturne.accent : .clear).padding(4))
-                    .frame(width: 18, height: 18)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("\(minutes) minutes")
-                        .font(.system(size: 15, weight: .medium))
-                        .monospacedDigit()
-                        .foregroundStyle(choisi ? Nocturne.accent200 : Nocturne.texte)
-                    Text(sousTitre)
-                        .font(.system(size: 11.5))
-                        .foregroundStyle(Nocturne.neutre400)
-                }
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .background(choisi ? Nocturne.accent900 : Nocturne.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(choisi ? Nocturne.accent : Nocturne.neutre700, lineWidth: 1.5)
-            )
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
+    /// L'heure du créneau, en minutes depuis minuit (ce que le profil retient).
+    private var minutesDepuisMinuit: Int {
+        let composantes = Calendar.current.dateComponents([.hour, .minute], from: heureCreneau)
+        return (composantes.hour ?? 19) * 60 + (composantes.minute ?? 0)
     }
 
     private var prevision: String {
@@ -217,7 +194,9 @@ struct OnboardingView: View {
             Spacer()
             pointsDePage(actif: 4)
                 .padding(.bottom, 22)
-            BoutonPilule(titre: "Commencer à pratiquer") { terminer(objectifMinutes) }
+            BoutonPilule(titre: "Commencer à pratiquer") {
+                terminer(objectifMinutes, minutesDepuisMinuit)
+            }
         }
     }
 

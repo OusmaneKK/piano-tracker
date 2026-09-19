@@ -4,6 +4,8 @@ import SwiftData
 /// Le timer de pratique : grand anneau, lecture/pause, remise à zéro, terminer.
 struct SessionView: View {
     @Bindable var vm: SessionViewModel
+    /// L'objectif du jour, rappelé sous le titre.
+    let objectifMinutes: Int
     /// Appelé quand la session est terminée (retour à l'accueil).
     var terminer: () -> Void
 
@@ -15,8 +17,9 @@ struct SessionView: View {
         VStack(spacing: 20) {
             VStack(spacing: 4) {
                 Kicker(texte: "Session de pratique")
-                Text("Clair de Lune — Section B")
+                Text("Objectif du jour : \(objectifMinutes) min")
                     .font(.system(size: 16, weight: .medium))
+                    .monospacedDigit()
             }
             .padding(.top, 16)
 
@@ -71,10 +74,7 @@ struct SessionView: View {
             if midi.estConnecte {
                 carteComptageAutomatique
             } else {
-                HStack(spacing: 10) {
-                    pastille(icone: "metronome", texte: "72 bpm")
-                    pastille(icone: "pianokeys", texte: "Clavier non connecté")
-                }
+                pastille(icone: "pianokeys", texte: "Aucun clavier connecté")
             }
 
             Spacer(minLength: 0)

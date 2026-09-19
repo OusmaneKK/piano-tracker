@@ -7,8 +7,8 @@ struct AujourdhuiView: View {
     var allerPratiquer: () -> Void
 
     @Query(sort: \SessionPratique.date) private var sessions: [SessionPratique]
-    @State private var montrerAgenda = false
     @State private var montrerQuiz = false
+    @State private var montrerReglages = false
 
     var body: some View {
         ScrollView {
@@ -25,13 +25,8 @@ struct AujourdhuiView: View {
         .fullScreenCover(isPresented: $montrerQuiz) {
             QuizView()
         }
-        .sheet(isPresented: $montrerAgenda) {
-            EditeurCreneauAgenda(heure: Calendar.current.date(bySettingHour: 19, minute: 0,
-                                                              second: 0, of: .now) ?? .now,
-                                 dureeMinutes: profil.objectifQuotidienMinutes) { _ in
-                montrerAgenda = false
-            }
-            .ignoresSafeArea()
+        .sheet(isPresented: $montrerReglages) {
+            ReglagesView(profil: profil)
         }
     }
 
@@ -73,13 +68,20 @@ struct AujourdhuiView: View {
                     .font(.system(size: 22, weight: .medium))
             }
             Spacer()
-            ZStack {
-                Circle().fill(Nocturne.accent800)
-                Image(systemName: "music.note")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(Nocturne.accent200)
+            Button {
+                montrerReglages = true
+            } label: {
+                ZStack {
+                    Circle().fill(Nocturne.accent800)
+                    Image(systemName: "gearshape")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Nocturne.accent200)
+                }
+                .frame(width: 38, height: 38)
+                .contentShape(Circle())
             }
-            .frame(width: 38, height: 38)
+            .buttonStyle(.plain)
+            .accessibilityLabel("Réglages")
         }
     }
 
@@ -170,28 +172,20 @@ struct AujourdhuiView: View {
 
     private var suggestions: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Continuer")
+            Text("S'exercer")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(Nocturne.neutre300)
+            ligneSuggestion(icone: "timer", fondIcone: Nocturne.accent900,
+                            teinteIcone: Nocturne.accent300,
+                            titre: "Lancer une session",
+                            sousTitre: minutesAujourdhui > 0
+                                ? "Reprendre là où tu t'es arrêté aujourd'hui"
+                                : "Le timer compte chaque minute jouée")
             ligneSuggestion(icone: "music.note", fondIcone: Nocturne.accent900,
                             teinteIcone: Nocturne.accent300,
                             titre: "Quiz de notes",
                             sousTitre: "Clés de sol et de fa · altérations · série de 10") {
                 montrerQuiz = true
-            }
-            ligneSuggestion(icone: "music.note.list", fondIcone: Nocturne.accent900,
-                            teinteIcone: Nocturne.accent300,
-                            titre: "Clair de Lune — Section B",
-                            sousTitre: "Arpèges main gauche · 62 % appris")
-            ligneSuggestion(icone: "metronome", fondIcone: Nocturne.neutre800,
-                            teinteIcone: Nocturne.neutre300,
-                            titre: "Gammes — Ré majeur",
-                            sousTitre: "Échauffement · 10 min")
-            ligneSuggestion(icone: "calendar", fondIcone: Nocturne.neutre800,
-                            teinteIcone: Nocturne.neutre300,
-                            titre: "Réserver mon créneau",
-                            sousTitre: "Un rendez-vous quotidien dans ton agenda") {
-                montrerAgenda = true
             }
         }
     }

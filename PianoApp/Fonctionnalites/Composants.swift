@@ -32,6 +32,46 @@ struct Kicker: View {
     }
 }
 
+/// Une option à cocher : pastille ronde, titre, sous-titre.
+/// Sert au choix de l'objectif quotidien (onboarding et réglages).
+struct LigneOption: View {
+    let titre: String
+    let sousTitre: String
+    let choisi: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                Circle()
+                    .strokeBorder(choisi ? Nocturne.accent : Nocturne.neutre500, lineWidth: 2)
+                    .background(Circle().fill(choisi ? Nocturne.accent : .clear).padding(4))
+                    .frame(width: 18, height: 18)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(titre)
+                        .font(.system(size: 15, weight: .medium))
+                        .monospacedDigit()
+                        .foregroundStyle(choisi ? Nocturne.accent200 : Nocturne.texte)
+                    Text(sousTitre)
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(Nocturne.neutre400)
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(choisi ? Nocturne.accent900 : Nocturne.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(choisi ? Nocturne.accent : Nocturne.neutre700, lineWidth: 1.5)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 /// Anneau de progression avec lueur accent (objectif du jour, timer de session).
 struct AnneauProgression: View {
     let progression: Double // 0...1
