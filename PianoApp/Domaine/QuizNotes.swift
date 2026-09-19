@@ -158,11 +158,24 @@ enum QuizNotes {
     static func tirer(cle: Cle, avecAlterations: Bool,
                       differenteDe precedente: NotePortee?,
                       avec generateur: inout some RandomNumberGenerator) -> NotePortee {
-        let naturelles = notes(cle: cle)
+        tirer(parmi: notes(cle: cle), avecAlterations: avecAlterations,
+              differenteDe: precedente, avec: &generateur)
+    }
+
+    /// Le tirage, à partir d'un vivier de notes déjà choisi (un palier).
+    static func tirer(parmi vivier: [NotePortee], avecAlterations: Bool,
+                      differenteDe precedente: NotePortee?,
+                      avec generateur: inout some RandomNumberGenerator) -> NotePortee {
+        let naturelles = vivier
+        // Un vivier qui ne porte qu'un seul nom ne permet pas d'éviter la
+        // répétition : mieux vaut la répéter que tourner en rond.
+        let peutEviterLaRepetition = Set(vivier.map(\.nom)).count > 1
         while true {
             guard let base = naturelles.randomElement(using: &generateur) else {
-                return NotePortee(nom: .do, octave: 4, cle: cle)
+                return NotePortee(nom: .do, octave: 4)
             }
+            guard peutEviterLaRepetition else { return base }
+            let cle = base.cle
             var note = base
             if avecAlterations, Int.random(in: 0..<3, using: &generateur) == 0 {
                 if Bool.random(using: &generateur), nomsDiese.contains(base.nom) {
@@ -179,6 +192,14 @@ enum QuizNotes {
                       differenteDe precedente: NotePortee?) -> NotePortee {
         var generateur = SystemRandomNumberGenerator()
         return tirer(cle: cle, avecAlterations: avecAlterations,
+                     differenteDe: precedente, avec: &generateur)
+    }
+
+    /// Le tirage d'un palier de la route de lecture.
+    static func tirer(palier: Palier, differenteDe precedente: NotePortee?) -> NotePortee {
+        var generateur = SystemRandomNumberGenerator()
+        return tirer(parmi: RouteLecture.notes(du: palier),
+                     avecAlterations: palier.avecAlterations,
                      differenteDe: precedente, avec: &generateur)
     }
 }

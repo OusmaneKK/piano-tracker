@@ -188,7 +188,7 @@ struct AujourdhuiView: View {
             ligneSuggestion(icone: "music.note", fondIcone: Nocturne.accent900,
                             teinteIcone: Nocturne.accent300,
                             titre: "Quiz de notes",
-                            sousTitre: "Clés de sol et de fa · altérations · série de 10") {
+                            sousTitre: "Ta route de lecture · \(RouteLecture.paliers.count) paliers") {
                 montrerQuiz = true
             }
         }

@@ -35,6 +35,7 @@ PianoApp/
     QuizNotes.swift    notes en clé de sol (Do4–Fa5), positions sur la portée, tirage
     SuiviMIDI.swift    comptage automatique : seuil de silence, date de pause
     StatistiquesQuiz.swift  taux de réussite, progression, notes qui résistent
+    RouteLecture.swift      les 7 paliers, leur ouverture, leur maîtrise
   Fonctionnalites/
     RacineView.swift   barre d'onglets custom + aiguillage onboarding
     Onboarding/        4 étapes : principe, objectif quotidien, créneau agenda, clavier
@@ -98,9 +99,16 @@ PianoAppTests/
   (jour passé + durée), suppression avec confirmation.
 
 ### 6. Quiz de notes (première fonctionnalité post-MVP, design « mini-clavier »)
-- Accès depuis Aujourd'hui, plein écran. Réglages avant la série : clé de sol
-  (Do4–Fa5) ou clé de fa (Sol2–Do4, le Do central au-dessus), altérations ♯/♭
-  en option (~1 question sur 3 ; enharmonie : Sol♯ et La♭ = la même touche noire).
+- Accès depuis Aujourd'hui, plein écran. L'écran d'accueil est **la route de
+  lecture** : 7 paliers (`Domaine/RouteLecture.swift`), des cinq lignes de la
+  clé de sol aux deux clés mêlées avec altérations.
+- Un palier s'ouvre à **9/10 une seule fois** sur le précédent — la progression
+  ne se bloque jamais. La **maîtrise** (étoile) demande 10/10 **et** moins de
+  3 s par note : c'est là, et seulement là, que la vitesse compte.
+- Chrono : une barre repère (6 s) et le temps par note. Il ne sanctionne
+  jamais une bonne réponse lente ; justesse et vitesse restent deux mesures
+  distinctes, sinon les deux deviennent illisibles.
+- Enharmonie conservée : Sol♯ et La♭ = la même touche noire.
 - Réponse en touchant la touche du mini-clavier (une octave complète, touches
   noires actives quand les altérations le sont).
 - Série de 10, score final, bandeau pédagogique (« C'était La — 2ᵉ interligne »).
