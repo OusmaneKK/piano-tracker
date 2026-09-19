@@ -3,6 +3,62 @@ import XCTest
 
 final class ProgressionTests: XCTestCase {
 
+    // MARK: Rythme hebdomadaire
+
+    private let maintenant = Date(timeIntervalSince1970: 1_700_000_000)
+
+    private func ilYA(_ jours: Double) -> Date {
+        maintenant.addingTimeInterval(-jours * 86_400)
+    }
+
+    func testRythmeSansSession() {
+        XCTAssertEqual(Progression.rythmeHebdomadaire(sessions: [], aujourdHui: maintenant), 0)
+    }
+
+    func testRythmeDUnDebutantNEstPasDiviseParQuatre() {
+        // Trois jours de pratique, une heure par jour : diviser par 4 semaines
+        // donnerait 0,75 h/semaine — un mensonge décourageant. On divise par
+        // une semaine (le plancher), soit 3 h/semaine.
+        let sessions = [(date: ilYA(3), secondes: 3600),
+                        (date: ilYA(2), secondes: 3600),
+                        (date: ilYA(1), secondes: 3600)]
+        XCTAssertEqual(Progression.rythmeHebdomadaire(sessions: sessions, aujourdHui: maintenant),
+                       3, accuracy: 0.01)
+    }
+
+    func testRythmeSurQuatreSemainesPleines() {
+        // Une heure par jour depuis 28 jours : 7 h par semaine.
+        let sessions = (1...28).map { (date: ilYA(Double($0)), secondes: 3600) }
+        XCTAssertEqual(Progression.rythmeHebdomadaire(sessions: sessions, aujourdHui: maintenant),
+                       7, accuracy: 0.1)
+    }
+
+    func testRythmeSurDeuxSemaines() {
+        // 14 sessions d'une heure réparties sur 14 jours : 7 h par semaine,
+        // et non 3,5 comme le donnait la division systématique par quatre.
+        let sessions = (1...14).map { (date: ilYA(Double($0)), secondes: 3600) }
+        XCTAssertEqual(Progression.rythmeHebdomadaire(sessions: sessions, aujourdHui: maintenant),
+                       7, accuracy: 0.15)
+    }
+
+    func testRythmeIgnoreLesSessionsHorsFenetre() {
+        // Une session d'il y a deux mois ne dit plus rien du rythme actuel.
+        let sessions = [(date: ilYA(60), secondes: 36_000),
+                        (date: ilYA(7), secondes: 3600),
+                        (date: ilYA(1), secondes: 3600)]
+        let rythme = Progression.rythmeHebdomadaire(sessions: sessions, aujourdHui: maintenant)
+        XCTAssertEqual(rythme, 2, accuracy: 0.01)
+    }
+
+    func testRythmeUneSeuleSessionAujourdHui() {
+        // Une session aujourd'hui : le plancher d'une semaine évite d'annoncer
+        // un rythme délirant (1 h en 0 jour = l'infini).
+        let sessions = [(date: maintenant, secondes: 3600)]
+        XCTAssertEqual(Progression.rythmeHebdomadaire(sessions: sessions, aujourdHui: maintenant),
+                       1, accuracy: 0.01)
+    }
+
+
     // Calendrier et repère fixes pour des tests déterministes.
     private var calendrier: Calendar = {
         var c = Calendar(identifier: .gregorian)

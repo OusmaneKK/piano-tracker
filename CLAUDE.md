@@ -122,7 +122,12 @@ PianoAppTests/
 ### Règles du domaine
 - La série (« jours consécutifs avec au moins une session ») tolère **une** journée manquée
   si l'utilisateur reprend le lendemain. Le but est de tenir des mois, pas de culpabiliser.
-- Les prévisions se basent sur le rythme réel des 4 dernières semaines ; à défaut, sur l'objectif quotidien.
+- Les prévisions se basent sur le rythme réel (`Progression.rythmeHebdomadaire`) ;
+  à défaut de session, sur l'objectif quotidien.
+- Le rythme observe **au plus** les 4 dernières semaines, mais ne divise que par
+  le temps réellement écoulé depuis la première session de la fenêtre, avec un
+  plancher d'une semaine. Diviser systématiquement par quatre écraserait le
+  rythme d'un débutant et découragerait au pire moment.
 
 ## Hors périmètre du MVP (ne pas implémenter, ne pas préparer « au cas où »)
 - Détection audio, métronome fonctionnel (les mentions à l'écran restent du texte).

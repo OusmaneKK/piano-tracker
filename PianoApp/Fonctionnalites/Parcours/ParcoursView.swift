@@ -24,11 +24,10 @@ struct ParcoursView: View {
         Double(sessions.reduce(0) { $0 + $1.dureeSecondes }) / 3600
     }
 
-    /// Rythme réel : heures des 28 derniers jours ramenées à la semaine.
+    /// Rythme réel des dernières semaines (calcul dans le domaine).
     private var heuresParSemaine: Double {
-        let seuil = Calendar.current.date(byAdding: .day, value: -28, to: .now) ?? .now
-        let secondes = sessions.filter { $0.date >= seuil }.reduce(0) { $0 + $1.dureeSecondes }
-        return Double(secondes) / 3600 / 4
+        Progression.rythmeHebdomadaire(
+            sessions: sessions.map { (date: $0.date, secondes: $0.dureeSecondes) })
     }
 
     // MARK: Sections
