@@ -100,7 +100,11 @@ struct RacineView: View {
         .onChange(of: sessionVM.suiviMIDIArme) { _, _ in majVeille() }
         .onChange(of: scenePhase) { _, phase in
             switch phase {
-            case .active: sessionVM.rafraichir()
+            case .active:
+                sessionVM.rafraichir()
+                // Un note-off perdu pendant la mise en veille laisserait une
+                // note fantôme, et plus aucun accord ne se reconnaîtrait.
+                midi.oublierLesTouchesTenues()
             case .background:
                 sessionVM.sauvegarder()
                 publierResume()

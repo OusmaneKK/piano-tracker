@@ -1,17 +1,23 @@
 import SwiftUI
 
 /// L'Atelier : le cercle des quintes en miroir de ce qu'on joue.
-/// Touche des notes sur le clavier du bas (ou, plus tard, sur le vrai piano) et
-/// le cercle montre où l'accord se situe — un accord appartient à plusieurs
+/// Joue un accord sur ton piano — ou pose-le au doigt sur le clavier du bas —
+/// et le cercle montre où il se situe : un accord appartient à plusieurs
 /// tonalités voisines, et c'est toute la leçon.
 struct AtelierView: View {
-    @State private var touchesTenues: Set<Touche> = []
+    @Environment(GestionnaireMIDI.self) private var midi
+
+    /// Les notes posées au doigt sur l'écran, quand aucun clavier ne joue.
+    @State private var touchesDoigt: Set<Touche> = []
     @State private var tonaliteConsultee = CercleDesQuintes.majeures[0]
     @State private var ficheAffichee: Tonalite?
+    /// Le dernier accord reconnu, gardé après le relâchement : on peut lâcher
+    /// les touches et continuer à lire le cercle.
+    @State private var accord: Accord?
 
-    /// L'accord formé par les touches posées, s'il en forme un.
-    private var accord: Accord? {
-        CercleDesQuintes.accord(pour: touchesTenues)
+    /// Ce qui sonne en ce moment : le vrai piano s'il joue, sinon l'écran.
+    private var touchesTenues: Set<Touche> {
+        midi.touchesTenues.isEmpty ? touchesDoigt : midi.touchesTenues
     }
 
     private var places: [CercleDesQuintes.Place] {
@@ -32,18 +38,34 @@ struct AtelierView: View {
             lecture
                 .padding(.bottom, 12)
             ClavierPiano(eclairages: eclairages, hauteur: 118) { touche in
-                if touchesTenues.contains(touche) {
-                    touchesTenues.remove(touche)
+                if touchesDoigt.contains(touche) {
+                    touchesDoigt.remove(touche)
                 } else {
-                    touchesTenues.insert(touche)
+                    touchesDoigt.insert(touche)
                 }
             }
             aide
         }
         .padding(.horizontal, 20)
         .padding(.top, 12)
+        .task { midi.demarrer() }
+        // Dès que le vrai piano parle, l'écran s'efface : on ne mélange pas
+        // des notes posées au doigt avec celles qui sonnent vraiment.
+        .onChange(of: midi.touchesTenues) { _, tenues in
+            if !tenues.isEmpty { touchesDoigt = [] }
+            majAccord()
+        }
+        .onChange(of: touchesDoigt) { _, _ in majAccord() }
         .sheet(item: $ficheAffichee) { tonalite in
             FicheTonaliteView(tonalite: tonalite)
+        }
+    }
+
+    /// Retient le dernier accord reconnu. Tant qu'on n'en joue pas un autre,
+    /// le cercle garde son arc allumé — sinon relâcher effacerait la réponse.
+    private func majAccord() {
+        if let nouveau = CercleDesQuintes.accord(pour: touchesTenues) {
+            accord = nouveau
         }
     }
 
@@ -57,10 +79,20 @@ struct AtelierView: View {
                     .police(20, .medium)
             }
             Spacer()
-            if !touchesTenues.isEmpty {
-                Button("Effacer") { touchesTenues = [] }
-                    .police(12.5)
+            if midi.estConnecte {
+                Image(systemName: "pianokeys")
+                    .police(16)
                     .foregroundStyle(Nocturne.accent300)
+                    .accessibilityLabel("Clavier connecté")
+                    .padding(.trailing, accord != nil ? 10 : 0)
+            }
+            if accord != nil || !touchesDoigt.isEmpty {
+                Button("Effacer") {
+                    touchesDoigt = []
+                    accord = nil
+                }
+                .police(12.5)
+                .foregroundStyle(Nocturne.accent300)
             }
         }
     }
@@ -76,7 +108,9 @@ struct AtelierView: View {
                              detail: "Pose une triade — trois notes qui s'empilent en tierces — pour que le cercle la situe.")
             } else {
                 carteLecture(titre: tonaliteConsultee.libelle,
-                             detail: "Extérieur : les majeures · intérieur : leurs relatives mineures. Touche une tonalité pour sa fiche.")
+                             detail: midi.estConnecte
+                                ? "Joue un accord sur ton piano : le cercle allumera les tonalités qui le contiennent."
+                                : "Extérieur : les majeures · intérieur : leurs relatives mineures. Touche une tonalité pour sa fiche.")
             }
         }
     }
@@ -114,9 +148,11 @@ struct AtelierView: View {
     }
 
     private var aide: some View {
-        Text(touchesTenues.isEmpty
-             ? "Touche trois notes pour former un accord"
-             : "Touche à nouveau une note pour la retirer")
+        Text(midi.estConnecte
+             ? "Joue un accord sur ton piano, ou pose-le au doigt"
+             : touchesDoigt.isEmpty
+                ? "Touche trois notes pour former un accord"
+                : "Touche à nouveau une note pour la retirer")
             .police(11)
             .foregroundStyle(Nocturne.neutre500)
             .frame(maxWidth: .infinity)
@@ -124,18 +160,16 @@ struct AtelierView: View {
             .padding(.bottom, 4)
     }
 
-    /// Les doigts posés, et la gamme consultée en fond quand rien n'est joué.
+    /// Ce que le clavier montre : les doigts posés en premier, sinon les notes
+    /// du dernier accord joué, sinon la gamme de la tonalité consultée.
     private var eclairages: [Touche: EclairageTouche] {
-        var resultat: [Touche: EclairageTouche] = [:]
-        if touchesTenues.isEmpty {
-            let gamme = tonaliteConsultee.touches
-            for touche in Touche.octave {
-                resultat[touche] = gamme.contains(touche) ? .membre : .eteinte
-            }
-        } else {
-            for touche in touchesTenues { resultat[touche] = .tenue }
+        if !touchesTenues.isEmpty {
+            return Dictionary(uniqueKeysWithValues: touchesTenues.map { ($0, .tenue) })
         }
-        return resultat
+        let allumees = accord?.touches ?? tonaliteConsultee.touches
+        return Dictionary(uniqueKeysWithValues: Touche.octave.map { touche in
+            (touche, allumees.contains(touche) ? .membre : .eteinte)
+        })
     }
 }
 
