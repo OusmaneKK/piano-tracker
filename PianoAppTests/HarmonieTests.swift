@@ -53,6 +53,14 @@ final class HarmonieTests: XCTestCase {
         }
     }
 
+    func testArmureDiteEnToutesLettres() {
+        // Le texte affiché sous le cercle et en tête de la fiche.
+        XCTAssertEqual(Tonalite(NoteEcrite(.fa), .majeur).armureTexte, "1 bémol · Si♭")
+        XCTAssertEqual(Tonalite(NoteEcrite(.re), .majeur).armureTexte, "2 dièses · Fa♯ Do♯")
+        XCTAssertEqual(Tonalite(NoteEcrite(.do), .majeur).armureTexte, "aucune altération")
+        XCTAssertEqual(Tonalite(NoteEcrite(.la), .mineur).armureTexte, "aucune altération")
+    }
+
     func testOrdreDEcritureDesAlterations() {
         // Une armure de dièses commence toujours par Fa♯, une de bémols par Si♭.
         XCTAssertEqual(Tonalite(NoteEcrite(.sol), .majeur).armure.map(\.libelle), ["Fa♯"])

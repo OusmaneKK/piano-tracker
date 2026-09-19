@@ -28,9 +28,10 @@ struct AtelierView: View {
         VStack(spacing: 0) {
             entete
             Spacer(minLength: 0)
+            // Toucher une tonalité la sélectionne seulement : sa gamme s'allume
+            // au clavier. La fiche s'ouvre par la carte de lecture, en dessous.
             CercleView(places: places, selection: tonaliteConsultee) { tonalite in
                 tonaliteConsultee = tonalite
-                ficheAffichee = tonalite
             }
             Spacer(minLength: 0)
             // La lecture se place juste au-dessus du clavier : on lit le
@@ -97,25 +98,35 @@ struct AtelierView: View {
         }
     }
 
-    /// Ce que le cercle raconte : l'accord et ses places, ou la tonalité
-    /// consultée tant qu'on n'a rien joué.
+    /// La carte porte deux choses : ce que l'accord joué raconte, et l'accès à
+    /// la fiche de la tonalité sélectionnée — toujours présent, puisque c'est
+    /// désormais le seul chemin vers elle.
     private var lecture: some View {
-        Group {
+        VStack(spacing: 0) {
             if let accord {
-                carteLecture(titre: accord.libelle, detail: rolesTexte)
+                ligneLecture(titre: accord.libelle, detail: rolesTexte)
             } else if touchesTenues.count >= 2 {
-                carteLecture(titre: "\(touchesTenues.count) notes",
+                ligneLecture(titre: "\(touchesTenues.count) notes",
                              detail: "Pose une triade — trois notes qui s'empilent en tierces — pour que le cercle la situe.")
             } else {
-                carteLecture(titre: tonaliteConsultee.libelle,
+                ligneLecture(titre: "Ta tonalité",
                              detail: midi.estConnecte
                                 ? "Joue un accord sur ton piano : le cercle allumera les tonalités qui le contiennent."
-                                : "Extérieur : les majeures · intérieur : leurs relatives mineures. Touche une tonalité pour sa fiche.")
+                                : "Sa gamme est allumée au clavier. Joue par-dessus : le cercle situera tes accords.")
             }
+            Rectangle()
+                .fill(accord != nil ? Nocturne.accent700.opacity(0.5) : Nocturne.neutre800)
+                .frame(height: 1)
+            ligneFiche
         }
+        .background(accord != nil ? Nocturne.accent900.opacity(0.45) : Nocturne.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .strokeBorder(accord != nil ? Nocturne.accent700 : Nocturne.neutre700,
+                          lineWidth: 1))
     }
 
-    private func carteLecture(titre: String, detail: String) -> some View {
+    private func ligneLecture(titre: String, detail: String) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(titre)
                 .police(14, .medium)
@@ -129,11 +140,36 @@ struct AtelierView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 14)
         .padding(.vertical, 11)
-        .background(accord != nil ? Nocturne.accent900.opacity(0.45) : Nocturne.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
-            .strokeBorder(accord != nil ? Nocturne.accent700 : Nocturne.neutre700,
-                          lineWidth: 1))
+    }
+
+    /// « Fa majeur · 1 bémol › » — la tonalité sélectionnée, et sa fiche.
+    private var ligneFiche: some View {
+        Button {
+            ficheAffichee = tonaliteConsultee
+        } label: {
+            HStack(spacing: 8) {
+                Text(tonaliteConsultee.libelle)
+                    .police(13, .medium)
+                Text("·")
+                    .police(12)
+                    .foregroundStyle(Nocturne.neutre600)
+                Text(tonaliteConsultee.armureTexte)
+                    .police(11.5)
+                    .foregroundStyle(Nocturne.neutre400)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Spacer(minLength: 4)
+                Image(systemName: "chevron.right")
+                    .police(11)
+                    .foregroundStyle(Nocturne.neutre500)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Fiche de \(tonaliteConsultee.libelle), \(tonaliteConsultee.armureTexte)")
+        .accessibilityHint("Ouvre l'armure, la gamme et les accords")
     }
 
     /// « I de Do · IV de Sol · V de Fa » — le même accord sert plusieurs tonalités.
@@ -151,7 +187,7 @@ struct AtelierView: View {
         Text(midi.estConnecte
              ? "Joue un accord sur ton piano, ou pose-le au doigt"
              : touchesDoigt.isEmpty
-                ? "Touche trois notes pour former un accord"
+                ? "Touche une tonalité pour allumer sa gamme, ou trois notes pour un accord"
                 : "Touche à nouveau une note pour la retirer")
             .police(11)
             .foregroundStyle(Nocturne.neutre500)
@@ -160,15 +196,17 @@ struct AtelierView: View {
             .padding(.bottom, 4)
     }
 
-    /// Ce que le clavier montre : les doigts posés en premier, sinon les notes
-    /// du dernier accord joué, sinon la gamme de la tonalité consultée.
+    /// Le clavier superpose quatre niveaux, du plus fort au plus faible : ce qui
+    /// sonne maintenant, les notes du dernier accord, la gamme de la tonalité
+    /// sélectionnée, et le reste. On voit ainsi *où l'on est* et *ce qu'on joue*
+    /// en même temps.
     private var eclairages: [Touche: EclairageTouche] {
-        if !touchesTenues.isEmpty {
-            return Dictionary(uniqueKeysWithValues: touchesTenues.map { ($0, .tenue) })
-        }
-        let allumees = accord?.touches ?? tonaliteConsultee.touches
+        let gamme = tonaliteConsultee.touches
+        let notesAccord = accord?.touches ?? []
         return Dictionary(uniqueKeysWithValues: Touche.octave.map { touche in
-            (touche, allumees.contains(touche) ? .membre : .eteinte)
+            if touchesTenues.contains(touche) { return (touche, EclairageTouche.tenue) }
+            if notesAccord.contains(touche) { return (touche, .attendue) }
+            return (touche, gamme.contains(touche) ? .membre : .eteinte)
         })
     }
 }

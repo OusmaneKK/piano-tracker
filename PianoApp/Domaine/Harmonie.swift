@@ -184,6 +184,17 @@ struct Tonalite: Hashable, Identifiable {
             + (mode == .mineur ? -3 : 0)
     }
 
+    /// L'armure dite en toutes lettres : « 1 bémol · Si♭ », « 2 dièses · Fa♯ Do♯ »,
+    /// « aucune altération ».
+    var armureTexte: String {
+        let notes = armure
+        guard !notes.isEmpty else { return "aucune altération" }
+        let nombre = abs(nbAlterations)
+        let nom = nbAlterations > 0 ? "dièse" : "bémol"
+        return "\(nombre) \(nom)\(nombre > 1 ? "s" : "") · "
+            + notes.map(\.libelle).joined(separator: " ")
+    }
+
     /// L'armure dans l'ordre d'écriture : Fa♯ Do♯ Sol♯… ou Si♭ Mi♭ La♭…
     var armure: [NoteEcrite] {
         guard nbAlterations != 0 else { return [] }
