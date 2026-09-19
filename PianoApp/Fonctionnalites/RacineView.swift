@@ -57,7 +57,10 @@ struct RacineView: View {
                         case .aujourdhui:
                             AujourdhuiView(profil: profil) { onglet = .session }
                         case .session:
-                            SessionView(vm: sessionVM) { onglet = .aujourdhui }
+                            SessionView(vm: sessionVM,
+                                        objectifMinutes: profil.objectifQuotidienMinutes) {
+                                onglet = .aujourdhui
+                            }
                         case .parcours:
                             ParcoursView()
                         case .stats:
@@ -68,8 +71,9 @@ struct RacineView: View {
                     barreOnglets
                 }
             } else {
-                OnboardingView { objectifMinutes in
-                    terminerOnboarding(objectifMinutes: objectifMinutes)
+                OnboardingView { objectifMinutes, heureCreneauMinutes in
+                    terminerOnboarding(objectifMinutes: objectifMinutes,
+                                       heureCreneauMinutes: heureCreneauMinutes)
                 }
             }
         }
@@ -140,13 +144,15 @@ struct RacineView: View {
         UIApplication.shared.isIdleTimerDisabled = sessionVM.enCours || sessionVM.suiviMIDIArme
     }
 
-    private func terminerOnboarding(objectifMinutes: Int) {
+    private func terminerOnboarding(objectifMinutes: Int, heureCreneauMinutes: Int) {
         if let profil {
             profil.objectifQuotidienMinutes = objectifMinutes
+            profil.heureCreneauMinutes = heureCreneauMinutes
             profil.onboardingTermine = true
         } else {
             contexte.insert(Profil(objectifQuotidienMinutes: objectifMinutes,
-                                   onboardingTermine: true))
+                                   onboardingTermine: true,
+                                   heureCreneauMinutes: heureCreneauMinutes))
         }
     }
 }

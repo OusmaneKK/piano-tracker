@@ -41,6 +41,7 @@ PianoApp/
     Session/           SessionView + SessionViewModel (timer)
     Quiz/              QuizView + QuizViewModel (lecture de notes, série de 10)
     MIDI/              GestionnaireMIDI (CoreMIDI) + appairage Bluetooth (CoreAudioKit)
+    Reglages/          objectif quotidien, créneau, clavier MIDI, version
     Parcours/          heures investies + frise des jalons
     Statistiques/      tuiles, barres hebdo, prévision
   Persistance/         modèles SwiftData : SessionPratique, Profil
@@ -71,7 +72,9 @@ PianoAppTests/
 - Salutation selon l'heure, date du jour.
 - Anneau de progression : minutes pratiquées aujourd'hui / objectif quotidien.
 - Série en cours (flamme), route des 10 000 heures (barre + pourcentage).
-- Suggestions « Continuer » (contenu statique pour le MVP) → onglet Session.
+- Section « S'exercer » : lancer une session, quiz de notes. **Aucun contenu
+  factice** — tout ce qui s'affiche vient des vraies données.
+- Bouton réglages (roue dentée) dans l'en-tête.
 
 ### 3. Session (timer)
 - Grand anneau (cible visuelle 25 min), timer mm:ss, lecture/pause, remise à zéro, terminer.
@@ -109,6 +112,12 @@ PianoAppTests/
   développeur payant, le trousseau non. À remplacer par un App Group + store
   SwiftData partagé le jour d'un compte payant.
 - Le widget ne lit jamais la base SwiftData : il n'a que le résumé.
+
+### 8. Réglages (depuis l'en-tête d'Aujourd'hui)
+- Objectif quotidien modifiable à tout moment (les mêmes paliers qu'à l'onboarding).
+- Heure du créneau, **mémorisée dans le profil**, et réservation dans l'agenda.
+- Clavier MIDI : statut de connexion et appairage Bluetooth.
+- Version installée affichée (savoir quel build tourne sur l'appareil).
 
 ### Règles du domaine
 - La série (« jours consécutifs avec au moins une session ») tolère **une** journée manquée
