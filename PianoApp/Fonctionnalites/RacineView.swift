@@ -113,17 +113,23 @@ struct RacineView: View {
                 } label: {
                     VStack(spacing: 3) {
                         Image(systemName: actif ? o.iconeActive : o.icone)
-                            .font(.system(size: 21))
+                            .police(21)
                         Text(o.libelle)
-                            .font(.system(size: 10))
+                            .police(10)
                     }
                     .foregroundStyle(actif ? Nocturne.accent300 : Nocturne.neutre500)
                     .frame(maxWidth: .infinity, minHeight: 50)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(o.libelle)
+                .accessibilityAddTraits(actif ? [.isButton, .isSelected] : .isButton)
             }
         }
+        // La barre d'onglets garde une hauteur fixe : on borne la mise à
+        // l'échelle de ses libellés pour qu'ils ne débordent pas.
+        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
         .padding(.horizontal, 8)
         .padding(.top, 6)
         .background(

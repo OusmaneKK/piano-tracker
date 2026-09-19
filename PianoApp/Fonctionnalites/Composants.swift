@@ -1,5 +1,26 @@
 import SwiftUI
 
+/// La police du design, mise à l'échelle par le réglage de taille de texte
+/// d'iOS. `Font.system(size:)` ignore Dynamic Type ; `@ScaledMetric` applique
+/// le même facteur à toutes les tailles, ce qui préserve les rapports de
+/// Nocturne au lieu de les écraser sur des styles sémantiques.
+private struct PoliceNocturne: ViewModifier {
+    @ScaledMetric(relativeTo: .body) private var echelle: CGFloat = 1
+    let taille: CGFloat
+    let poids: Font.Weight
+
+    func body(content: Content) -> some View {
+        content.font(.system(size: taille * echelle, weight: poids))
+    }
+}
+
+extension View {
+    /// Police du design suivant Dynamic Type (remplace `.font(.system(size:))`).
+    func police(_ taille: CGFloat, _ poids: Font.Weight = .regular) -> some View {
+        modifier(PoliceNocturne(taille: taille, poids: poids))
+    }
+}
+
 /// Bouton principal Nocturne : pilule au contour accent, jamais d'aplat.
 struct BoutonPilule: View {
     let titre: String
@@ -8,7 +29,7 @@ struct BoutonPilule: View {
     var body: some View {
         Button(action: action) {
             Text(titre)
-                .font(.system(size: 15, weight: .medium))
+                .police(15, .medium)
                 .foregroundStyle(Nocturne.accent200)
                 .frame(maxWidth: .infinity, minHeight: 48)
                 .overlay(
@@ -26,7 +47,7 @@ struct Kicker: View {
 
     var body: some View {
         Text(texte.uppercased())
-            .font(.system(size: 11, weight: .regular))
+            .police(11, .regular)
             .kerning(1.3)
             .foregroundStyle(Nocturne.neutre400)
     }
@@ -49,11 +70,11 @@ struct LigneOption: View {
                     .frame(width: 18, height: 18)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(titre)
-                        .font(.system(size: 15, weight: .medium))
+                        .police(15, .medium)
                         .monospacedDigit()
                         .foregroundStyle(choisi ? Nocturne.accent200 : Nocturne.texte)
                     Text(sousTitre)
-                        .font(.system(size: 11.5))
+                        .police(11.5)
                         .foregroundStyle(Nocturne.neutre400)
                 }
                 Spacer()

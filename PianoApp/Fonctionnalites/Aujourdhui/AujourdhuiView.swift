@@ -65,7 +65,7 @@ struct AujourdhuiView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Kicker(texte: dateDuJour)
                 Text(salutation)
-                    .font(.system(size: 22, weight: .medium))
+                    .police(22, .medium)
             }
             Spacer()
             Button {
@@ -74,7 +74,7 @@ struct AujourdhuiView: View {
                 ZStack {
                     Circle().fill(Nocturne.accent800)
                     Image(systemName: "gearshape")
-                        .font(.system(size: 16, weight: .medium))
+                        .police(16, .medium)
                         .foregroundStyle(Nocturne.accent200)
                 }
                 .frame(width: 38, height: 38)
@@ -92,39 +92,43 @@ struct AujourdhuiView: View {
             ZStack {
                 AnneauProgression(progression: Double(minutesAujourdhui) / Double(objectif),
                                   diametre: 104, epaisseur: 7)
+                    .accessibilityHidden(true)
                 VStack(spacing: 0) {
                     Text("\(minutesAujourdhui)")
-                        .font(.system(size: 22, weight: .medium))
+                        .police(22, .medium)
                         .monospacedDigit()
                     Text("sur \(objectif) min")
-                        .font(.system(size: 10))
+                        .police(10)
                         .foregroundStyle(Nocturne.neutre400)
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Objectif du jour")
+            .accessibilityValue("\(minutesAujourdhui) minutes pratiquées sur \(objectif)")
             VStack(alignment: .leading, spacing: 0) {
                 Text("Pratique du jour")
-                    .font(.system(size: 15, weight: .medium))
+                    .police(15, .medium)
                 Text(restant > 0
                      ? "Encore \(restant) minutes pour atteindre l'objectif du jour. La régularité bat l'intensité."
                      : "Objectif atteint — chaque minute de plus compte double.")
-                    .font(.system(size: 12.5))
+                    .police(12.5)
                     .foregroundStyle(Nocturne.neutre300)
                     .lineSpacing(2)
                     .padding(.top, 4)
                 if serie > 0 {
                     HStack(spacing: 6) {
-                        Image(systemName: "flame.fill").font(.system(size: 14))
+                        Image(systemName: "flame.fill").police(14)
                         Text("Série de \(serie) jour\(serie > 1 ? "s" : "")")
                     }
-                    .font(.system(size: 12.5))
+                    .police(12.5)
                     .foregroundStyle(Nocturne.accent300)
                     .padding(.top, 10)
                 }
                 HStack(spacing: 6) {
-                    Image(systemName: "timer").font(.system(size: 13))
+                    Image(systemName: "timer").police(13)
                     Text("Enregistré à la fin de chaque session")
                 }
-                .font(.system(size: 11.5))
+                .police(11.5)
                 .foregroundStyle(Nocturne.neutre400)
                 .padding(.top, 6)
             }
@@ -149,7 +153,7 @@ struct AujourdhuiView: View {
                 Kicker(texte: "La route des 10 000 heures")
                 Spacer()
                 Text(pourcentageTexte(pct))
-                    .font(.system(size: 11))
+                    .police(11)
                     .monospacedDigit()
                     .foregroundStyle(Nocturne.accent300)
             }
@@ -160,7 +164,7 @@ struct AujourdhuiView: View {
                 Spacer()
                 Text("10 000")
             }
-            .font(.system(size: 11.5))
+            .police(11.5)
             .monospacedDigit()
             .foregroundStyle(Nocturne.neutre400)
             .padding(.top, 8)
@@ -173,7 +177,7 @@ struct AujourdhuiView: View {
     private var suggestions: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("S'exercer")
-                .font(.system(size: 13, weight: .medium))
+                .police(13, .medium)
                 .foregroundStyle(Nocturne.neutre300)
             ligneSuggestion(icone: "timer", fondIcone: Nocturne.accent900,
                             teinteIcone: Nocturne.accent300,
@@ -198,19 +202,19 @@ struct AujourdhuiView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10, style: .continuous).fill(fondIcone)
                     Image(systemName: icone)
-                        .font(.system(size: 20))
+                        .police(20)
                         .foregroundStyle(teinteIcone)
                 }
                 .frame(width: 44, height: 44)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(titre).font(.system(size: 14, weight: .medium))
+                    Text(titre).police(14, .medium)
                     Text(sousTitre)
-                        .font(.system(size: 12))
+                        .police(12)
                         .foregroundStyle(Nocturne.neutre400)
                 }
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13))
+                    .police(13)
                     .foregroundStyle(Nocturne.neutre500)
             }
             .padding(.horizontal, 16)

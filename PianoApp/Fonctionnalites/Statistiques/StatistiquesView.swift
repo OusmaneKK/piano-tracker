@@ -11,7 +11,7 @@ struct StatistiquesView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Ton temps")
-                    .font(.system(size: 22, weight: .medium))
+                    .police(22, .medium)
                 tuiles
                 carteSemaine
                 cartePrevision
@@ -81,11 +81,11 @@ struct StatistiquesView: View {
     private func tuile(valeur: String, legende: String, accent: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(valeur)
-                .font(.system(size: 24, weight: .medium))
+                .police(24, .medium)
                 .monospacedDigit()
                 .foregroundStyle(accent ? Nocturne.accent300 : Nocturne.texte)
             Text(legende)
-                .font(.system(size: 11.5))
+                .police(11.5)
                 .foregroundStyle(Nocturne.neutre400)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -98,10 +98,10 @@ struct StatistiquesView: View {
         let maximum = max(barres.map(\.minutes).max() ?? 0, profil.objectifQuotidienMinutes, 1)
         return VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Cette semaine").font(.system(size: 13, weight: .medium))
+                Text("Cette semaine").police(13, .medium)
                 Spacer()
                 Text("minutes / jour")
-                    .font(.system(size: 11))
+                    .police(11)
                     .foregroundStyle(Nocturne.neutre400)
             }
             HStack(alignment: .bottom, spacing: 8) {
@@ -109,7 +109,7 @@ struct StatistiquesView: View {
                     VStack(spacing: 6) {
                         Spacer(minLength: 0)
                         Text("\(barre.minutes)")
-                            .font(.system(size: 10))
+                            .police(10)
                             .monospacedDigit()
                             .foregroundStyle(Nocturne.neutre400)
                         UnevenRoundedRectangle(topLeadingRadius: 5, bottomLeadingRadius: 2,
@@ -123,7 +123,7 @@ struct StatistiquesView: View {
                             .frame(height: CGFloat(barre.minutes) / CGFloat(maximum) * 78 + 6)
                             .shadow(color: barre.estAujourdhui ? Nocturne.lueur : .clear, radius: 4)
                         Text(barre.libelle)
-                            .font(.system(size: 10))
+                            .police(10)
                             .foregroundStyle(barre.estAujourdhui ? Nocturne.accent300 : Nocturne.neutre500)
                     }
                     .frame(maxWidth: .infinity)
@@ -138,9 +138,9 @@ struct StatistiquesView: View {
 
     private var cartePrevision: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("À ce rythme").font(.system(size: 13, weight: .medium))
+            Text("À ce rythme").police(13, .medium)
             Text(previsionTexte)
-                .font(.system(size: 12.5))
+                .police(12.5)
                 .foregroundStyle(Nocturne.neutre300)
                 .lineSpacing(3)
         }

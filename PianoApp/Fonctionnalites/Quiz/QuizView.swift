@@ -77,7 +77,7 @@ struct QuizView: View {
             Kicker(texte: "Quiz de notes")
                 .padding(.top, 26)
             Text("Ta série de \(QuizNotes.questionsParSerie)")
-                .font(.system(size: 22, weight: .medium))
+                .police(22, .medium)
                 .padding(.top, 6)
 
             VStack(spacing: 10) {
@@ -90,9 +90,9 @@ struct QuizView: View {
             Toggle(isOn: $avecAlterations) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Altérations ♯ ♭")
-                        .font(.system(size: 15, weight: .medium))
+                        .police(15, .medium)
                     Text("Les touches noires entrent en jeu")
-                        .font(.system(size: 11.5))
+                        .police(11.5)
                         .foregroundStyle(Nocturne.neutre400)
                 }
             }
@@ -104,21 +104,21 @@ struct QuizView: View {
 
             HStack(spacing: 14) {
                 Image(systemName: "pianokeys")
-                    .font(.system(size: 19))
+                    .police(19)
                     .foregroundStyle(midi.estConnecte ? Nocturne.accent300 : Nocturne.neutre400)
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Clavier MIDI")
-                        .font(.system(size: 15, weight: .medium))
+                        .police(15, .medium)
                     Text(midi.estConnecte
                          ? "Connecté — joue les notes pour répondre"
                          : "Réponds en jouant les vraies touches")
-                        .font(.system(size: 11.5))
+                        .police(11.5)
                         .foregroundStyle(midi.estConnecte ? Nocturne.accent300 : Nocturne.neutre400)
                 }
                 Spacer()
                 if !midi.estConnecte {
                     Button("Bluetooth…") { montrerBluetooth = true }
-                        .font(.system(size: 12.5))
+                        .police(12.5)
                         .foregroundStyle(Nocturne.accent300)
                         .padding(.horizontal, 11)
                         .padding(.vertical, 6)
@@ -149,10 +149,10 @@ struct QuizView: View {
                     .frame(width: 34)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(option.libelle)
-                        .font(.system(size: 15, weight: .medium))
+                        .police(15, .medium)
                         .foregroundStyle(choisie ? Nocturne.accent200 : Nocturne.texte)
                     Text(option == .sol ? "Main droite · Do4 à Fa5" : "Main gauche · Sol2 à Do4")
-                        .font(.system(size: 11.5))
+                        .police(11.5)
                         .foregroundStyle(Nocturne.neutre400)
                 }
                 Spacer()
@@ -185,19 +185,19 @@ struct QuizView: View {
                 }
                 .frame(height: 5)
                 Text("\(vm.numero) / \(QuizNotes.questionsParSerie)")
-                    .font(.system(size: 12))
+                    .police(12)
                     .monospacedDigit()
                     .foregroundStyle(Nocturne.neutre400)
                 if midi.estConnecte {
                     Image(systemName: "pianokeys")
-                        .font(.system(size: 12))
+                        .police(12)
                         .foregroundStyle(Nocturne.accent300)
                 }
             }
             Kicker(texte: "Quiz de notes · \(vm.cle.libelle)")
                 .padding(.top, 24)
             Text("Quelle est cette note ?")
-                .font(.system(size: 19, weight: .medium))
+                .police(19, .medium)
                 .padding(.top, 4)
 
             ZStack {
@@ -210,6 +210,8 @@ struct QuizView: View {
             }
             .frame(maxHeight: .infinity)
             .padding(.top, 18)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Portée en \(vm.cle.libelle), note à identifier")
 
             bandeau(vm)
                 .frame(height: 64)
@@ -219,6 +221,9 @@ struct QuizView: View {
                            active: vm.phase == .question) { touche in
                 vm.repondre(touche)
             }
+            // Le clavier garde des proportions de piano : on borne la mise à
+            // l'échelle du texte pour que les noms de touches restent dedans.
+            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         }
         .padding(.horizontal, 20)
         .padding(.top, 14)
@@ -230,13 +235,14 @@ struct QuizView: View {
             fermer()
         } label: {
             Image(systemName: "xmark")
-                .font(.system(size: 14))
+                .police(14)
                 .foregroundStyle(Nocturne.neutre300)
                 .frame(width: 34, height: 34)
                 .overlay(Circle().strokeBorder(Nocturne.neutre700, lineWidth: 1))
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Fermer le quiz")
     }
 
     private func bandeau(_ vm: QuizViewModel) -> some View {
@@ -260,10 +266,10 @@ struct QuizView: View {
                               fond: Color, bord: Color) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icone)
-                .font(.system(size: 19))
+                .police(19)
                 .foregroundStyle(teinte)
             Text(texte)
-                .font(.system(size: 13.5))
+                .police(13.5)
                 .foregroundStyle(teinte)
             Spacer(minLength: 0)
         }
@@ -296,13 +302,15 @@ struct QuizView: View {
             Spacer()
             Kicker(texte: "Série terminée · \(vm.cle.libelle)\(vm.avecAlterations ? " · ♯♭" : "")")
             Text("\(vm.score) / \(QuizNotes.questionsParSerie)")
-                .font(.system(size: 64, weight: .medium))
+                .police(64, .medium)
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
                 .foregroundStyle(Nocturne.accent200)
                 .shadow(color: Nocturne.lueur, radius: 15)
                 .padding(.top, 14)
             Text(messageFin(vm))
-                .font(.system(size: 13.5))
+                .police(13.5)
                 .foregroundStyle(Nocturne.neutre300)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
@@ -310,7 +318,7 @@ struct QuizView: View {
                 .padding(.top, 16)
             if let comparaison = comparaisonTexte(vm) {
                 Text(comparaison)
-                    .font(.system(size: 12.5))
+                    .police(12.5)
                     .monospacedDigit()
                     .foregroundStyle(Nocturne.accent300)
                     .multilineTextAlignment(.center)
@@ -319,11 +327,11 @@ struct QuizView: View {
             Spacer()
             BoutonPilule(titre: "Rejouer une série") { vm.rejouer() }
             Button("Changer les réglages") { self.vm = nil }
-                .font(.system(size: 13))
+                .police(13)
                 .foregroundStyle(Nocturne.neutre400)
                 .padding(.top, 14)
             Button("Terminer") { fermer() }
-                .font(.system(size: 13))
+                .police(13)
                 .foregroundStyle(Nocturne.neutre400)
                 .padding(.top, 10)
         }
@@ -373,12 +381,12 @@ struct PorteeView: View {
             }
             if note.cle == .sol {
                 Text("\u{1D11E}")
-                    .font(.system(size: 100))
+                    .police(100)
                     .foregroundStyle(Nocturne.neutre200)
                     .offset(x: -largeur / 2 + 32, y: -2)
             } else {
                 Text("\u{1D122}")
-                    .font(.system(size: 74))
+                    .police(74)
                     .foregroundStyle(Nocturne.neutre200)
                     .offset(x: -largeur / 2 + 30, y: -11)
             }
@@ -396,7 +404,7 @@ struct PorteeView: View {
             }
             if note.alteration != .naturelle {
                 Text(note.alteration.rawValue)
-                    .font(.system(size: 34, weight: .medium))
+                    .police(34, .medium)
                     .foregroundStyle(teinteNote)
                     .offset(x: xNote - 27, y: y(position: note.position))
             }
@@ -481,7 +489,7 @@ struct ClavierReponse: View {
                 .shadow(color: estCorrecte ? Nocturne.lueur : .clear, radius: 11)
                 .overlay(alignment: .bottom) {
                     Text(nom.rawValue)
-                        .font(.system(size: 13, weight: .medium))
+                        .police(13, .medium)
                         .foregroundStyle(estCorrecte ? Nocturne.accent900 : Nocturne.neutre800)
                         .padding(.bottom, 10)
                 }
@@ -489,6 +497,8 @@ struct ClavierReponse: View {
         }
         .buttonStyle(.plain)
         .disabled(!active)
+        .accessibilityLabel(nom.rawValue)
+        .accessibilityHint("Répondre \(nom.rawValue)")
     }
 
     private func toucheNoire(_ gauche: NomNote) -> some View {
@@ -509,5 +519,7 @@ struct ClavierReponse: View {
         }
         .buttonStyle(.plain)
         .disabled(!active)
+        .accessibilityLabel("\(gauche.rawValue) dièse")
+        .accessibilityHint("Touche noire, aussi \(gauche.suivante.rawValue) bémol")
     }
 }

@@ -20,16 +20,25 @@ struct OnboardingView: View {
     ]
 
     var body: some View {
-        Group {
-            switch etape {
-            case 1: principe
-            case 2: objectif
-            case 3: creneau
-            default: clavier
+        // Aux grandes tailles de texte le contenu dépasse l'écran : il défile
+        // alors au lieu d'être tronqué, tout en gardant la mise en page pleine
+        // hauteur (les Spacer) quand il tient.
+        GeometryReader { geo in
+            ScrollView {
+                Group {
+                    switch etape {
+                    case 1: principe
+                    case 2: objectif
+                    case 3: creneau
+                    default: clavier
+                    }
+                }
+                .frame(minHeight: geo.size.height - 24, alignment: .top)
+                .padding(.horizontal, 26)
+                .padding(.bottom, 24)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
-        .padding(.horizontal, 26)
-        .padding(.bottom, 24)
     }
 
     // MARK: Étape 1 — le principe
@@ -39,16 +48,18 @@ struct OnboardingView: View {
             Spacer().frame(height: 70)
             Kicker(texte: "Le principe de la pratique")
             Text("10 000")
-                .font(.system(size: 64, weight: .medium))
+                .police(64, .medium)
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
                 .foregroundStyle(Nocturne.accent200)
                 .shadow(color: Nocturne.lueur, radius: 15)
                 .padding(.top, 18)
             Text("heures vers la maîtrise")
-                .font(.system(size: 15))
+                .police(15)
                 .foregroundStyle(Nocturne.neutre300)
             Text("Il n'y a pas de raccourci. La recherche sur l'expertise pointe une seule chose : la pratique délibérée, accumulée. Cette app existe pour t'aider à mettre les heures — et à faire compter chaque minute.")
-                .font(.system(size: 13.5))
+                .police(13.5)
                 .foregroundStyle(Nocturne.neutre300)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
@@ -67,9 +78,9 @@ struct OnboardingView: View {
         VStack(alignment: .leading, spacing: 0) {
             Spacer().frame(height: 60)
             Text("Combien de temps, chaque jour ?")
-                .font(.system(size: 22, weight: .medium))
+                .police(22, .medium)
             Text("La régularité compte plus que les coups d'éclat. Choisis un objectif que tu peux tenir.")
-                .font(.system(size: 13))
+                .police(13)
                 .foregroundStyle(Nocturne.neutre300)
                 .lineSpacing(3)
                 .padding(.top, 6)
@@ -88,7 +99,7 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Kicker(texte: "À ce rythme")
                 Text(prevision)
-                    .font(.system(size: 12.5))
+                    .police(12.5)
                     .foregroundStyle(Nocturne.neutre200)
                     .lineSpacing(3)
             }
@@ -126,9 +137,9 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer().frame(height: 60)
             Text("Réserve ton créneau")
-                .font(.system(size: 22, weight: .medium))
+                .police(22, .medium)
             Text("Même heure, même geste, chaque jour. Un créneau réservé dans ton agenda est plus difficile à ignorer qu'une bonne intention.")
-                .font(.system(size: 13.5))
+                .police(13.5)
                 .foregroundStyle(Nocturne.neutre300)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
@@ -143,7 +154,7 @@ struct OnboardingView: View {
                 .padding(.top, 18)
 
             Text("\(objectifMinutes) minutes · tous les jours")
-                .font(.system(size: 12.5))
+                .police(12.5)
                 .monospacedDigit()
                 .foregroundStyle(Nocturne.accent300)
                 .padding(.top, 6)
@@ -153,7 +164,7 @@ struct OnboardingView: View {
                 .padding(.bottom, 22)
             BoutonPilule(titre: "Réserver dans mon agenda") { montrerAgenda = true }
             Button("Plus tard") { etape = 4 }
-                .font(.system(size: 13))
+                .police(13)
                 .foregroundStyle(Nocturne.neutre400)
                 .padding(.top, 14)
         }
@@ -177,15 +188,15 @@ struct OnboardingView: View {
                     .overlay(Circle().strokeBorder(Nocturne.accent700, lineWidth: 1.5))
                     .shadow(color: Nocturne.lueur.opacity(0.66), radius: 13)
                 Image(systemName: "pianokeys")
-                    .font(.system(size: 40))
+                    .police(40)
                     .foregroundStyle(Nocturne.accent200)
             }
             .frame(width: 96, height: 96)
             Text("Connecte ton clavier")
-                .font(.system(size: 22, weight: .medium))
+                .police(22, .medium)
                 .padding(.top, 22)
             Text("Branche-le en Bluetooth MIDI et réponds au quiz de notes en jouant les vraies touches. Le comptage automatique des minutes arrive ensuite — en attendant, le timer de session s'en charge.")
-                .font(.system(size: 13.5))
+                .police(13.5)
                 .foregroundStyle(Nocturne.neutre300)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)

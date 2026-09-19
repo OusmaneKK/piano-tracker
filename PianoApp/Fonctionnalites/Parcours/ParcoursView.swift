@@ -36,9 +36,9 @@ struct ParcoursView: View {
         VStack(alignment: .leading, spacing: 3) {
             Kicker(texte: "Le parcours")
             Text("10 000 heures vers la maîtrise")
-                .font(.system(size: 22, weight: .medium))
+                .police(22, .medium)
             Text("L'expertise n'est pas un talent — c'est du temps délibéré, accumulé. Chaque session te fait avancer sur cette route.")
-                .font(.system(size: 12.5))
+                .police(12.5)
                 .foregroundStyle(Nocturne.neutre300)
                 .lineSpacing(3)
                 .padding(.top, 3)
@@ -49,16 +49,16 @@ struct ParcoursView: View {
         let pct = Progression.pourcentage(heuresTotales: heuresTotales)
         return VStack(spacing: 0) {
             Text(FormatTemps.heuresEntieres(heuresTotales))
-                .font(.system(size: 46, weight: .medium))
+                .police(46, .medium)
                 .monospacedDigit()
             Text("heures investies · \(String(format: "%.1f", pct).replacingOccurrences(of: ".", with: ",")) % du chemin")
-                .font(.system(size: 12))
+                .police(12)
                 .foregroundStyle(Nocturne.accent200)
                 .padding(.top, 2)
             BarreProgression(fraction: pct / 100, fondClair: true)
                 .padding(.top, 14)
             Text(rythmeTexte)
-                .font(.system(size: 11))
+                .police(11)
                 .foregroundStyle(Nocturne.accent200.opacity(0.85))
                 .padding(.top, 8)
         }
@@ -116,15 +116,15 @@ struct ParcoursView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(jalon.titre)
-                        .font(.system(size: 14, weight: .medium))
+                        .police(14, .medium)
                         .foregroundStyle(atteint ? Nocturne.accent300 : Nocturne.texte)
                     Text("\(FormatTemps.heuresEntieres(jalon.heures)) h")
-                        .font(.system(size: 11.5))
+                        .police(11.5)
                         .monospacedDigit()
                         .foregroundStyle(Nocturne.neutre400)
                 }
                 Text(jalon.detail)
-                    .font(.system(size: 12))
+                    .police(12)
                     .foregroundStyle(Nocturne.neutre400)
                     .lineSpacing(2)
             }

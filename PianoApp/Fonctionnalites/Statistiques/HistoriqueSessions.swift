@@ -17,14 +17,14 @@ struct SectionHistorique: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Sessions récentes").font(.system(size: 13, weight: .medium))
+                Text("Sessions récentes").police(13, .medium)
                 Spacer()
                 Button {
                     montrerSaisie = true
                 } label: {
                     HStack(spacing: 5) {
-                        Image(systemName: "plus").font(.system(size: 11, weight: .medium))
-                        Text("Ajouter").font(.system(size: 12))
+                        Image(systemName: "plus").police(11, .medium)
+                        Text("Ajouter").police(12)
                     }
                     .foregroundStyle(Nocturne.accent300)
                     .padding(.horizontal, 10)
@@ -37,7 +37,7 @@ struct SectionHistorique: View {
 
             if sessions.isEmpty {
                 Text("Aucune session pour l'instant — la première s'enregistre à la fin du timer, ou ajoute-la ici à la main.")
-                    .font(.system(size: 12.5))
+                    .police(12.5)
                     .foregroundStyle(Nocturne.neutre400)
                     .lineSpacing(3)
                     .padding(.vertical, 6)
@@ -52,7 +52,7 @@ struct SectionHistorique: View {
                 }
                 if sessions.count > limite {
                     Text("… et \(sessions.count - limite) autres, toutes comptées dans la route.")
-                        .font(.system(size: 11))
+                        .police(11)
                         .foregroundStyle(Nocturne.neutre500)
                 }
             }
@@ -82,26 +82,27 @@ struct SectionHistorique: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(jourTexte(session.date))
-                    .font(.system(size: 13, weight: .medium))
+                    .police(13, .medium)
                 Text(heureTexte(session.date))
-                    .font(.system(size: 11))
+                    .police(11)
                     .foregroundStyle(Nocturne.neutre500)
             }
             Spacer()
             Text("\(session.dureeMinutes) min")
-                .font(.system(size: 13))
+                .police(13)
                 .monospacedDigit()
                 .foregroundStyle(Nocturne.accent300)
             Button {
                 sessionASupprimer = session
             } label: {
                 Image(systemName: "trash")
-                    .font(.system(size: 13))
+                    .police(13)
                     .foregroundStyle(Nocturne.neutre500)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Supprimer la session de \(session.dureeMinutes) minutes du \(jourTexte(session.date))")
         }
         .padding(.vertical, 8)
     }
@@ -143,21 +144,21 @@ struct SaisieSessionView: View {
                 Kicker(texte: "Session oubliée")
                     .padding(.top, 26)
                 Text("Ajouter une session")
-                    .font(.system(size: 20, weight: .medium))
+                    .police(20, .medium)
                     .padding(.top, 6)
 
                 DatePicker("Jour", selection: $jour, in: ...Date.now,
                            displayedComponents: .date)
                     .datePickerStyle(.compact)
                     .tint(Nocturne.accent)
-                    .font(.system(size: 14))
+                    .police(14)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
                     .carteNocturne()
                     .padding(.top, 22)
 
                 HStack {
-                    Text("Durée").font(.system(size: 14))
+                    Text("Durée").police(14)
                     Spacer()
                     Picker("Durée", selection: $dureeMinutes) {
                         ForEach(Array(stride(from: 5, through: 180, by: 5)), id: \.self) { minutes in
@@ -180,7 +181,7 @@ struct SaisieSessionView: View {
                     fermer()
                 }
                 Button("Annuler") { fermer() }
-                    .font(.system(size: 13))
+                    .police(13)
                     .foregroundStyle(Nocturne.neutre400)
                     .padding(.top, 14)
                     .padding(.bottom, 10)
