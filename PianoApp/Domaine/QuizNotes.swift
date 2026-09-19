@@ -12,6 +12,12 @@ enum NomNote: String, CaseIterable {
         let indice = Self.allCases.firstIndex(of: self) ?? 0
         return Self.allCases[(indice + 6) % 7]
     }
+
+    /// Le nom suivant dans l'ordre diatonique (Si → Do).
+    var suivante: NomNote {
+        let indice = Self.allCases.firstIndex(of: self) ?? 0
+        return Self.allCases[(indice + 1) % 7]
+    }
 }
 
 /// Les deux clés lues par le quiz.

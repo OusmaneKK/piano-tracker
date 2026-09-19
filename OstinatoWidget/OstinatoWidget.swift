@@ -59,6 +59,8 @@ struct AnneauAccessoire: View {
                 .monospacedDigit()
         }
         .gaugeStyle(.accessoryCircularCapacity)
+        .accessibilityLabel("Pratique du jour")
+        .accessibilityValue("\(resume.minutesAujourdhui) minutes sur \(resume.objectifQuotidienMinutes)")
     }
 }
 

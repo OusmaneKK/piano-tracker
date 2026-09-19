@@ -56,20 +56,21 @@ struct ReglagesView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Kicker(texte: "Ostinato")
                 Text("Réglages")
-                    .font(.system(size: 22, weight: .medium))
+                    .police(22, .medium)
             }
             Spacer()
             Button {
                 fermer()
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 14))
+                    .police(14)
                     .foregroundStyle(Nocturne.neutre300)
                     .frame(width: 34, height: 34)
                     .overlay(Circle().strokeBorder(Nocturne.neutre700, lineWidth: 1))
                     .contentShape(Circle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Fermer les réglages")
         }
         .padding(.top, 18)
     }
@@ -78,7 +79,7 @@ struct ReglagesView: View {
         VStack(alignment: .leading, spacing: 10) {
             titreSection("Objectif quotidien")
             Text("Change-le quand ta vie change — mieux vaut un objectif tenu qu'un objectif ambitieux.")
-                .font(.system(size: 12.5))
+                .police(12.5)
                 .foregroundStyle(Nocturne.neutre400)
                 .lineSpacing(2)
                 .padding(.bottom, 2)
@@ -99,9 +100,9 @@ struct ReglagesView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Heure de pratique")
-                        .font(.system(size: 15, weight: .medium))
+                        .police(15, .medium)
                     Text("Mémorisée pour tes prochains rendez-vous")
-                        .font(.system(size: 11.5))
+                        .police(11.5)
                         .foregroundStyle(Nocturne.neutre400)
                 }
                 Spacer()
@@ -128,15 +129,15 @@ struct ReglagesView: View {
             titreSection("Clavier MIDI")
             HStack(spacing: 14) {
                 Image(systemName: "pianokeys")
-                    .font(.system(size: 19))
+                    .police(19)
                     .foregroundStyle(midi.estConnecte ? Nocturne.accent300 : Nocturne.neutre400)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(midi.estConnecte ? "Clavier connecté" : "Aucun clavier")
-                        .font(.system(size: 15, weight: .medium))
+                        .police(15, .medium)
                     Text(midi.estConnecte
                          ? "Il répond au quiz et peut compter tes sessions"
                          : "Appaire ton piano pour jouer tes réponses")
-                        .font(.system(size: 11.5))
+                        .police(11.5)
                         .foregroundStyle(midi.estConnecte ? Nocturne.accent300 : Nocturne.neutre400)
                 }
                 Spacer(minLength: 0)
@@ -155,11 +156,11 @@ struct ReglagesView: View {
     private var pied: some View {
         VStack(alignment: .leading, spacing: 3) {
             Text("Ostinato \(versionTexte)")
-                .font(.system(size: 11.5))
+                .police(11.5)
                 .monospacedDigit()
                 .foregroundStyle(Nocturne.neutre500)
             Text("La route des 10 000 heures se marche un jour à la fois.")
-                .font(.system(size: 11.5))
+                .police(11.5)
                 .foregroundStyle(Nocturne.neutre600)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -175,7 +176,7 @@ struct ReglagesView: View {
 
     private func titreSection(_ texte: String) -> some View {
         Text(texte)
-            .font(.system(size: 13, weight: .medium))
+            .police(13, .medium)
             .foregroundStyle(Nocturne.neutre300)
     }
 }

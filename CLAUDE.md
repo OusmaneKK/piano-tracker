@@ -125,6 +125,14 @@ PianoAppTests/
 - Clavier MIDI : statut de connexion et appairage Bluetooth.
 - Version installée affichée (savoir quel build tourne sur l'appareil).
 
+### Accessibilité
+- Les tailles de texte passent par `.police(_:_:)` (Composants.swift), qui suit
+  Dynamic Type via `@ScaledMetric` : **ne jamais réécrire `.font(.system(size:))`**.
+- Les écrans dont la mise en page est géométrique (anneau de session, clavier du
+  quiz, barre d'onglets) bornent la mise à l'échelle ; les écrans de texte
+  défilent plutôt que de tronquer.
+- Tout contrôle sans libellé visible (icône seule) porte un `accessibilityLabel`.
+
 ### Règles du domaine
 - La série (« jours consécutifs avec au moins une session ») tolère **une** journée manquée
   si l'utilisateur reprend le lendemain. Le but est de tenir des mois, pas de culpabiliser.

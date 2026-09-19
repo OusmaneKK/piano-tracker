@@ -18,7 +18,7 @@ struct SessionView: View {
             VStack(spacing: 4) {
                 Kicker(texte: "Session de pratique")
                 Text("Objectif du jour : \(objectifMinutes) min")
-                    .font(.system(size: 16, weight: .medium))
+                    .police(16, .medium)
                     .monospacedDigit()
             }
             .padding(.top, 16)
@@ -29,21 +29,27 @@ struct SessionView: View {
                                       diametre: 230, epaisseur: 8)
                     VStack(spacing: 2) {
                         Text(vm.affichage)
-                            .font(.system(size: 44, weight: .medium))
+                            .police(44, .medium)
                             .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                         Text(vm.sousTexte)
-                            .font(.system(size: 12))
+                            .police(12)
                             .foregroundStyle(Nocturne.neutre400)
                     }
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Temps de pratique")
+                .accessibilityValue("\(vm.secondesEcoulees / 60) minutes \(vm.secondesEcoulees % 60) secondes, \(vm.sousTexte)")
                 Text("Chaque minute s'ajoute à ta route des 10 000 heures")
-                    .font(.system(size: 12))
+                    .police(12)
                     .foregroundStyle(Nocturne.neutre400)
             }
             .padding(.top, 10)
 
             HStack(spacing: 22) {
-                boutonSecondaire(icone: "arrow.counterclockwise") {
+                boutonSecondaire(icone: "arrow.counterclockwise",
+                                 libelle: "Remettre le timer à zéro") {
                     if vm.secondesEcoulees > 0 {
                         confirmerRemiseAZero = true
                     }
@@ -55,7 +61,7 @@ struct SessionView: View {
                         Circle().fill(Nocturne.accent900)
                         Circle().strokeBorder(Nocturne.accent, lineWidth: 1.5)
                         Image(systemName: vm.enCours ? "pause.fill" : "play.fill")
-                            .font(.system(size: 28))
+                            .police(28)
                             .foregroundStyle(Nocturne.accent200)
                     }
                     .frame(width: 74, height: 74)
@@ -63,13 +69,16 @@ struct SessionView: View {
                     .contentShape(Circle())
                 }
                 .buttonStyle(.plain)
-                boutonSecondaire(icone: "checkmark") {
+                .accessibilityLabel(vm.enCours ? "Mettre la session en pause" : "Démarrer la session")
+                boutonSecondaire(icone: "checkmark",
+                                 libelle: "Terminer et enregistrer la session") {
                     if let duree = vm.terminer() {
                         contexte.insert(SessionPratique(dureeSecondes: duree))
                     }
                     terminer()
                 }
             }
+            .accessibilityElement(children: .contain)
 
             if midi.estConnecte {
                 carteComptageAutomatique
@@ -80,6 +89,9 @@ struct SessionView: View {
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 20)
+        // L'anneau et les boutons ronds ont une taille fixe : au-delà de cette
+        // borne, le texte déborderait de ses cercles.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .confirmationDialog("Remettre le timer à zéro ?",
                             isPresented: $confirmerRemiseAZero,
                             titleVisibility: .visible) {
@@ -96,15 +108,15 @@ struct SessionView: View {
     private var carteComptageAutomatique: some View {
         HStack(spacing: 12) {
             Image(systemName: "pianokeys")
-                .font(.system(size: 19))
+                .police(19)
                 .foregroundStyle(vm.suiviMIDIArme ? Nocturne.accent300 : Nocturne.neutre400)
             VStack(alignment: .leading, spacing: 1) {
                 Text("Comptage automatique")
-                    .font(.system(size: 14, weight: .medium))
+                    .police(14, .medium)
                 Text(vm.suiviMIDIArme
                      ? "Joue — je démarre, et le silence met en pause"
                      : "Laisse ton clavier lancer la session")
-                    .font(.system(size: 11.5))
+                    .police(11.5)
                     .foregroundStyle(vm.suiviMIDIArme ? Nocturne.accent300 : Nocturne.neutre400)
             }
             Spacer(minLength: 0)
@@ -117,24 +129,26 @@ struct SessionView: View {
         .carteNocturne()
     }
 
-    private func boutonSecondaire(icone: String, action: @escaping () -> Void) -> some View {
+    private func boutonSecondaire(icone: String, libelle: String,
+                                  action: @escaping () -> Void) -> some View {
         Button(action: action) {
             ZStack {
                 Circle().strokeBorder(Nocturne.neutre600, lineWidth: 1)
                 Image(systemName: icone)
-                    .font(.system(size: 20))
+                    .police(20)
                     .foregroundStyle(Nocturne.neutre300)
             }
             .frame(width: 52, height: 52)
             .contentShape(Circle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(libelle)
     }
 
     private func pastille(icone: String, texte: String) -> some View {
         HStack(spacing: 6) {
-            Image(systemName: icone).font(.system(size: 12))
-            Text(texte).font(.system(size: 12))
+            Image(systemName: icone).police(12)
+            Text(texte).police(12)
         }
         .foregroundStyle(Nocturne.neutre300)
         .padding(.horizontal, 13)
