@@ -8,6 +8,28 @@ Vision long terme : routines journalières, MIDI Bluetooth, lecture de partition
 Timer de session, objectif quotidien, série de jours, jalons de progression, statistiques.
 Un seul utilisateur au départ : l'auteur. Pas de backend, pas de compte, pas d'abonnement.
 
+### Cible préférentielle
+
+**Les adultes qui apprennent le piano seuls et qui sont déterminés.** Pas des enfants,
+pas des élèves encadrés par un professeur, pas des curieux venus pour s'amuser cinq minutes.
+
+Ce que ça implique, concrètement, à chaque décision produit :
+
+- **Dire la vérité plutôt que motiver artificiellement.** Ce public sait que 10 000 heures
+  est long ; il préfère un chiffre juste à un encouragement creux. D'où le rythme
+  hebdomadaire calculé honnêtement, les prévisions sur le rythme réel, et l'absence
+  de récompenses décoratives.
+- **Ne jamais bloquer la progression.** Un adulte déterminé n'a pas besoin qu'on le retienne :
+  les paliers du quiz s'ouvrent à 9/10 une seule fois, et c'est la maîtrise (facultative)
+  qui donne une raison de revenir.
+- **Comprendre, pas seulement réussir.** Chaque retour explique le pourquoi (« c'était La —
+  2ᵉ interligne », les degrés d'une tonalité, les tonalités voisines), parce que sans
+  professeur, l'app est la seule à pouvoir l'expliquer.
+- **Respecter le temps disponible.** Adultes : créneau à heure fixe dans l'agenda, séries
+  courtes, tolérance d'un jour manqué sur la série, historique corrigeable après coup.
+- **Pas de ludification niaise.** Ni avatars, ni confettis, ni vies à regagner. La
+  gratification vient des heures accumulées et de ce qu'on sait faire de plus qu'hier.
+
 Le design de référence est le projet Claude Design « Piano Learning App Design System »
 (écrans : Onboarding ×3, Aujourd'hui, Session, Parcours, Stats — thème « Nocturne »).
 Voir DESIGN.md pour la correspondance design → SwiftUI et les jetons de couleur.
