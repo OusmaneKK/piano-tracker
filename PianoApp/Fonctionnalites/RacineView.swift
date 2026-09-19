@@ -1,14 +1,15 @@
 import SwiftUI
 import SwiftData
 
-/// Les quatre onglets de l'app.
+/// Les cinq onglets de l'app.
 enum Onglet: CaseIterable {
-    case aujourdhui, session, parcours, stats
+    case aujourdhui, session, atelier, parcours, stats
 
     var libelle: String {
         switch self {
         case .aujourdhui: "Aujourd'hui"
         case .session: "Session"
+        case .atelier: "Atelier"
         case .parcours: "Parcours"
         case .stats: "Stats"
         }
@@ -18,6 +19,7 @@ enum Onglet: CaseIterable {
         switch self {
         case .aujourdhui: "house"
         case .session: "timer"
+        case .atelier: "circle.hexagongrid"
         case .parcours: "point.topleft.down.curvedto.point.bottomright.up"
         case .stats: "chart.bar"
         }
@@ -27,6 +29,7 @@ enum Onglet: CaseIterable {
         switch self {
         case .aujourdhui: "house.fill"
         case .session: "timer"
+        case .atelier: "circle.hexagongrid.fill"
         case .parcours: "point.topleft.down.curvedto.point.bottomright.up"
         case .stats: "chart.bar.fill"
         }
@@ -61,6 +64,8 @@ struct RacineView: View {
                                         objectifMinutes: profil.objectifQuotidienMinutes) {
                                 onglet = .aujourdhui
                             }
+                        case .atelier:
+                            AtelierView()
                         case .parcours:
                             ParcoursView()
                         case .stats:
