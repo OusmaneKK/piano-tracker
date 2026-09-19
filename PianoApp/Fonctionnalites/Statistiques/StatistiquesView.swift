@@ -15,6 +15,7 @@ struct StatistiquesView: View {
                 tuiles
                 carteSemaine
                 cartePrevision
+                SectionLectureNotes()
                 SectionHistorique(profil: profil)
             }
             .padding(.horizontal, 20)

@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// L'écran du quiz de notes (design « mini-clavier ») : réglages de la série,
 /// portée en grand, bandeau pédagogique, réponse en touchant la touche du piano.
@@ -8,6 +9,8 @@ struct QuizView: View {
     @State private var avecAlterations = false
     @State private var vm: QuizViewModel?
     @Environment(GestionnaireMIDI.self) private var midi
+    @Environment(\.modelContext) private var contexte
+    @Query(sort: \SerieQuiz.date, order: .reverse) private var series: [SerieQuiz]
     @State private var montrerBluetooth = false
 
     var body: some View {
@@ -26,9 +29,31 @@ struct QuizView: View {
         .foregroundStyle(Nocturne.texte)
         .task { midi.demarrer() }
         .onDisappear { midi.desabonner("quiz") }
+        // La série n'est enregistrée qu'une fois terminée : un score partiel
+        // ne dirait rien de la progression.
+        .onChange(of: vm?.phase) { _, nouvelle in
+            if nouvelle == .termine { enregistrerSerie() }
+        }
         .sheet(isPresented: $montrerBluetooth) {
             ConnexionBluetoothMIDI()
                 .ignoresSafeArea()
+        }
+    }
+
+    /// Enregistre la série terminée et chacune de ses réponses.
+    private func enregistrerSerie() {
+        guard let vm, !vm.reponses.isEmpty else { return }
+        let serie = SerieQuiz(cleLibelle: vm.cle.libelle,
+                              avecAlterations: vm.avecAlterations,
+                              score: vm.score,
+                              total: QuizNotes.questionsParSerie)
+        contexte.insert(serie)
+        for reponse in vm.reponses {
+            let ligne = ReponseQuiz(note: reponse.note.nomComplet,
+                                    position: reponse.note.position,
+                                    juste: reponse.juste)
+            ligne.serie = serie
+            contexte.insert(ligne)
         }
     }
 
@@ -283,6 +308,14 @@ struct QuizView: View {
                 .lineSpacing(4)
                 .frame(maxWidth: 290)
                 .padding(.top, 16)
+            if let comparaison = comparaisonTexte(vm) {
+                Text(comparaison)
+                    .font(.system(size: 12.5))
+                    .monospacedDigit()
+                    .foregroundStyle(Nocturne.accent300)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 12)
+            }
             Spacer()
             BoutonPilule(titre: "Rejouer une série") { vm.rejouer() }
             Button("Changer les réglages") { self.vm = nil }
@@ -296,6 +329,16 @@ struct QuizView: View {
         }
         .padding(.horizontal, 26)
         .padding(.bottom, 26)
+    }
+
+    /// Situe la série dans l'historique : record battu, ou meilleur score connu.
+    private func comparaisonTexte(_ vm: QuizViewModel) -> String? {
+        // La série qui vient de finir est déjà enregistrée : on compare aux autres.
+        let precedentes = series.dropFirst().map(\.score)
+        guard let meilleur = precedentes.max() else { return nil }
+        if vm.score > meilleur { return "Nouveau record — le précédent était \(meilleur) / \(QuizNotes.questionsParSerie)." }
+        if vm.score == meilleur { return "Tu égales ton meilleur score." }
+        return "Ton meilleur : \(meilleur) / \(QuizNotes.questionsParSerie) · \(precedentes.count + 1) séries jouées."
     }
 
     private func messageFin(_ vm: QuizViewModel) -> String {
