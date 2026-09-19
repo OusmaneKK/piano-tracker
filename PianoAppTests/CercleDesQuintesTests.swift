@@ -99,6 +99,29 @@ final class CercleDesQuintesTests: XCTestCase {
             pour: [.blanche(.do), .blanche(.re), .blanche(.mi)]))
     }
 
+    // MARK: Ce qui arrive du clavier MIDI
+
+    func testAccordJoueAuPianoAvecDoublureDOctave() {
+        // Do2, Mi3, Sol3 et un Do4 par-dessus : quatre notes MIDI, trois
+        // touches, un accord de Do majeur.
+        let touches = Set([36, 52, 55, 72].map { Touche.depuisNoteMIDI(UInt8($0)) })
+        XCTAssertEqual(touches.count, 3)
+        XCTAssertEqual(CercleDesQuintes.accord(pour: touches)?.libelle, "Do")
+    }
+
+    func testAccordJoueEnRenversementAuPiano() {
+        // Mi3 Sol3 Do4 — premier renversement de Do majeur.
+        let touches = Set([52, 55, 60].map { Touche.depuisNoteMIDI(UInt8($0)) })
+        XCTAssertEqual(CercleDesQuintes.accord(pour: touches)?.libelle, "Do")
+    }
+
+    func testUneNoteFantomeEmpecheLaReconnaissance() {
+        // Ce qui arrive si un note-off se perd : la quatrième touche traîne et
+        // plus rien ne se reconnaît. D'où `oublierLesTouchesTenues`.
+        let touches = Set([60, 64, 67, 62].map { Touche.depuisNoteMIDI(UInt8($0)) })
+        XCTAssertNil(CercleDesQuintes.accord(pour: touches))
+    }
+
     // MARK: Où l'accord se situe sur le cercle
 
     func testDoMajeurAppartientATroisTonalitesMajeures() {
