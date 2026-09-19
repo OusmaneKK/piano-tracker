@@ -17,6 +17,8 @@ final class QuizViewModel {
     private(set) var numero = 1
     private(set) var score = 0
     private(set) var phase: Phase = .question
+    /// Les réponses de la série en cours, enregistrées une fois la série finie.
+    private(set) var reponses: [(note: NotePortee, juste: Bool)] = []
 
     init(cle: Cle, avecAlterations: Bool) {
         self.cle = cle
@@ -33,6 +35,7 @@ final class QuizViewModel {
         guard phase == .question else { return }
         let juste = choix == note.toucheAttendue
         if juste { score += 1 }
+        reponses.append((note: note, juste: juste))
         phase = .repondu(choix: choix, juste: juste)
         // La lecture du bandeau demande un peu plus de temps après une erreur.
         Task { @MainActor [weak self] in
@@ -44,6 +47,7 @@ final class QuizViewModel {
     func rejouer() {
         score = 0
         numero = 1
+        reponses = []
         note = QuizNotes.tirer(cle: cle, avecAlterations: avecAlterations, differenteDe: note)
         phase = .question
     }

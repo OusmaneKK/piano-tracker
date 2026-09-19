@@ -8,6 +8,7 @@ struct PianoApp: App {
             RacineView()
                 .preferredColorScheme(.dark)
         }
-        .modelContainer(for: [SessionPratique.self, Profil.self, SessionEnCours.self])
+        .modelContainer(for: [SessionPratique.self, Profil.self, SessionEnCours.self,
+                              SerieQuiz.self, ReponseQuiz.self])
     }
 }

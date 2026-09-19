@@ -34,6 +34,7 @@ PianoApp/
     FormatTemps.swift  mm:ss, heures localisées
     QuizNotes.swift    notes en clé de sol (Do4–Fa5), positions sur la portée, tirage
     SuiviMIDI.swift    comptage automatique : seuil de silence, date de pause
+    StatistiquesQuiz.swift  taux de réussite, progression, notes qui résistent
   Fonctionnalites/
     RacineView.swift   barre d'onglets custom + aiguillage onboarding
     Onboarding/        4 étapes : principe, objectif quotidien, créneau agenda, clavier
@@ -44,7 +45,8 @@ PianoApp/
     Reglages/          objectif quotidien, créneau, clavier MIDI, version
     Parcours/          heures investies + frise des jalons
     Statistiques/      tuiles, barres hebdo, prévision
-  Persistance/         modèles SwiftData : SessionPratique, Profil
+  Persistance/         modèles SwiftData : SessionPratique, Profil, SessionEnCours,
+                       SerieQuiz + ReponseQuiz
   Ressources/          Assets.xcassets
 Partage/               code compilé dans l'app ET dans le widget
   ResumePratique.swift résumé du jour + dépôt/lecture dans le trousseau partagé
@@ -104,6 +106,10 @@ PianoAppTests/
 - Série de 10, score final, bandeau pédagogique (« C'était La — 2ᵉ interligne »).
 - Un clavier MIDI (Bluetooth ou USB) répond au quiz : note jouée = touche pressée.
 - Le quiz n'entame pas le compteur des 10 000 heures (théorie ≠ pratique).
+- Chaque série **terminée** est enregistrée (`SerieQuiz` + ses `ReponseQuiz`) ;
+  les séries abandonnées ne le sont pas. L'écran de fin situe le score par
+  rapport au meilleur, et Stats affiche le taux de réussite, la progression
+  et les notes qui résistent (`Domaine/StatistiquesQuiz.swift`).
 
 ### 7. Widget (écran verrouillé et écran d'accueil)
 - Anneau des minutes du jour, série, pourcentage de la route.
