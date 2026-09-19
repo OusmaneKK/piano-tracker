@@ -55,7 +55,7 @@ struct FicheTonaliteView: View {
     private var entete: some View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 1) {
-                Kicker(texte: armureTexte)
+                Kicker(texte: affichee.armureTexte)
                 Text(affichee.libelle)
                     .police(21, .medium)
             }
@@ -74,16 +74,6 @@ struct FicheTonaliteView: View {
             .accessibilityLabel("Fermer la fiche")
         }
         .padding(.top, 20)
-    }
-
-    /// « 1 bémol · Si♭ », « 2 dièses · Fa♯ Do♯ », « aucune altération ».
-    private var armureTexte: String {
-        let armure = affichee.armure
-        guard !armure.isEmpty else { return "aucune altération" }
-        let nombre = abs(affichee.nbAlterations)
-        let nom = affichee.nbAlterations > 0 ? "dièse" : "bémol"
-        return "\(nombre) \(nom)\(nombre > 1 ? "s" : "") · "
-            + armure.map(\.libelle).joined(separator: " ")
     }
 
     private var selecteur: some View {

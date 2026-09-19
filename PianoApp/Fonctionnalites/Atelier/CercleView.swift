@@ -52,33 +52,49 @@ struct CercleView: View {
         let place = place(de: tonalite)
         let foyer = place?.estFoyer ?? false
         let contient = place != nil
-        let choisie = places.isEmpty && tonalite == selection
+        // La sélection ne dépend plus de l'accord joué : on doit pouvoir
+        // étudier une tonalité **et** jouer par-dessus.
+        let choisie = tonalite == selection
         let majeure = tonalite.mode == .majeur
 
         return Button {
             choisir(tonalite)
         } label: {
             ZStack {
-                Circle().fill(fond(foyer: foyer, contient: contient,
-                                   choisie: choisie, majeure: majeure))
-                Circle().strokeBorder(bord(foyer: foyer, contient: contient,
-                                           choisie: choisie),
-                                      lineWidth: foyer || choisie ? 1.5 : 1)
+                Circle().fill(fond(foyer: foyer, contient: contient, majeure: majeure))
+                Circle().strokeBorder(bord(foyer: foyer, contient: contient),
+                                      lineWidth: foyer ? 1.5 : 1)
                 Text(libelle(tonalite))
                     .police(taille, majeure ? .medium : .regular)
                     .foregroundStyle(teinte(foyer: foyer, contient: contient,
-                                            choisie: choisie, majeure: majeure))
+                                            majeure: majeure))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                     .padding(.horizontal, 3)
             }
             .frame(width: diametre, height: diametre)
             .shadow(color: foyer ? Nocturne.lueur : .clear, radius: 10)
+            // L'anneau de sélection se pose **autour** de la pastille : il se
+            // superpose à n'importe quel état sans lui disputer son fond.
+            .overlay {
+                if choisie {
+                    Circle()
+                        .strokeBorder(Nocturne.accent, lineWidth: 1.5)
+                        .padding(-3.5)
+                }
+            }
             .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(tonalite.libelle)
-        .accessibilityValue(place.map { "\($0.degre.chiffrage) de cet accord" } ?? "")
+        .accessibilityValue(etatTexte(place: place, choisie: choisie))
+    }
+
+    private func etatTexte(place: CercleDesQuintes.Place?, choisie: Bool) -> String {
+        [choisie ? "sélectionnée" : nil,
+         place.map { "\($0.degre.chiffrage) de cet accord" }]
+            .compactMap { $0 }
+            .joined(separator: ", ")
     }
 
     /// Les mineures s'écrivent en minuscules et sans « m » : la convention
@@ -89,22 +105,24 @@ struct CercleView: View {
             : tonalite.tonique.libelle.lowercased()
     }
 
-    private func fond(foyer: Bool, contient: Bool, choisie: Bool, majeure: Bool) -> Color {
+    // Ces trois fonctions ne décrivent que le rapport à l'accord joué ;
+    // la sélection est rendue à part, par l'anneau.
+
+    private func fond(foyer: Bool, contient: Bool, majeure: Bool) -> Color {
         if foyer { return majeure ? Nocturne.accent : Nocturne.accent800 }
         if contient { return majeure ? Nocturne.accent900 : .clear }
-        if choisie { return Nocturne.accent900 }
         return majeure ? Nocturne.surface : .clear
     }
 
-    private func bord(foyer: Bool, contient: Bool, choisie: Bool) -> Color {
-        if foyer || choisie { return Nocturne.accent }
+    private func bord(foyer: Bool, contient: Bool) -> Color {
+        if foyer { return Nocturne.accent }
         if contient { return Nocturne.accent700 }
         return Nocturne.neutre800
     }
 
-    private func teinte(foyer: Bool, contient: Bool, choisie: Bool, majeure: Bool) -> Color {
+    private func teinte(foyer: Bool, contient: Bool, majeure: Bool) -> Color {
         if foyer { return majeure ? Nocturne.accent900 : Nocturne.accent100 }
-        if contient || choisie { return Nocturne.accent200 }
+        if contient { return Nocturne.accent200 }
         return majeure ? Nocturne.neutre300 : Nocturne.neutre500
     }
 }
