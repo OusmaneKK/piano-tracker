@@ -39,6 +39,30 @@ enum Progression {
         return compte
     }
 
+    /// Fenêtre d'observation du rythme réel, en jours.
+    static let joursObservation = 28
+
+    /// Rythme de pratique récent, en heures par semaine.
+    ///
+    /// On observe au plus les 4 dernières semaines, mais on ne divise que par
+    /// le temps réellement écoulé depuis la première session de la fenêtre —
+    /// au minimum une semaine. Diviser systématiquement par quatre écraserait
+    /// le rythme d'un débutant de trois jours, et la prévision « à ce rythme »
+    /// découragerait précisément au moment où elle devrait motiver.
+    static func rythmeHebdomadaire(sessions: [(date: Date, secondes: Int)],
+                                   aujourdHui: Date = .now,
+                                   calendrier: Calendar = .current) -> Double {
+        let debutFenetre = calendrier.date(byAdding: .day, value: -joursObservation,
+                                           to: aujourdHui) ?? aujourdHui
+        let recentes = sessions.filter { $0.date >= debutFenetre && $0.date <= aujourdHui }
+        guard let premiere = recentes.map(\.date).min() else { return 0 }
+
+        let heures = Double(recentes.reduce(0) { $0 + $1.secondes }) / 3600
+        let jours = aujourdHui.timeIntervalSince(premiere) / 86_400
+        let semaines = max(jours / 7, 1)
+        return heures / semaines
+    }
+
     /// Années restantes pour atteindre `heuresCible` au rythme hebdomadaire donné.
     /// `nil` si le rythme est nul (aucune prévision possible).
     static func anneesRestantes(heuresTotales: Double,
